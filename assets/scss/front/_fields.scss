@@ -1,0 +1,28 @@
+
+.lw-woo-gdpr-user-optins-items-list-wrap {
+
+	list-style-type: none;
+	margin: 0 0 20px;
+	padding: 0;
+
+	li {
+
+		.lw-woo-gdpr-user-optins-checkbox-label {
+			display: inline-block;
+		}
+
+		.lw-woo-gdpr-user-optins-required-text {
+			display: inline-block;
+			padding-left: 10px;
+			font-size: 90%;
+			font-style: italic;
+		}
+
+	}
+}
+
+@media only screen and (max-width: 782px) {}
+
+
+@media only screen and (max-width: 600px) {}
+
