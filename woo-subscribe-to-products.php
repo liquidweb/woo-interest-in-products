@@ -50,6 +50,12 @@ define( __NAMESPACE__ . '\TAB_BASE', '' );
 // Set the meta key name for products.
 define( __NAMESPACE__ . '\PROD_META_KEY', 'woo_product_subscribe' );
 
+// Set the meta key name for users.
+define( __NAMESPACE__ . '\USER_META_KEY', 'woo_user_subscribed_products' );
+
+// Load the multi-use files.
+require_once __DIR__ . '/includes/helpers.php';
+
 // Load the triggered file loads.
 require_once __DIR__ . '/includes/activate.php';
 require_once __DIR__ . '/includes/deactivate.php';
@@ -57,4 +63,4 @@ require_once __DIR__ . '/includes/uninstall.php';
 
 // Load the individual files.
 require_once __DIR__ . '/includes/post-meta.php';
-
+require_once __DIR__ . '/includes/checkout.php';
