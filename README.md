@@ -1,4 +1,4 @@
-# WooCommerce Subscribe To Product
+# WooCommerce Subscribe To Products
 Allow customers to opt-in to notices about individual products.
 
 
