@@ -53,8 +53,8 @@ module.exports = function( grunt ) {
           // npm install missing modules
           install: true
         },
-        // Search for require() in all js files in the src folder
-        src: ['src/*.js']
+        // Search for require() in all js files in the assets folder
+        src: ['assets/*.js']
       }
     },
 

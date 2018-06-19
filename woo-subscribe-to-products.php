@@ -47,7 +47,14 @@ define( __NAMESPACE__ . '\FRONT_VAR', '' );
 // Set our tab base slug constant.
 define( __NAMESPACE__ . '\TAB_BASE', '' );
 
+// Set the meta key name for products.
+define( __NAMESPACE__ . '\PROD_META_KEY', 'woo_product_subscribe' );
+
 // Load the triggered file loads.
 require_once __DIR__ . '/includes/activate.php';
 require_once __DIR__ . '/includes/deactivate.php';
 require_once __DIR__ . '/includes/uninstall.php';
+
+// Load the individual files.
+require_once __DIR__ . '/includes/post-meta.php';
+

@@ -2,14 +2,14 @@
 /**
  * Our deactivation call
  *
- * @package WooSubscribeToProduct
+ * @package WooSubscribeToProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProduct\Deactivate;
+namespace LiquidWeb\WooSubscribeToProducts\Deactivate;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProduct as Core;
+use LiquidWeb\WooSubscribeToProducts as Core;
 
 /**
  * Delete various options when deactivating the plugin.
@@ -19,7 +19,7 @@ use LiquidWeb\WooSubscribeToProduct as Core;
 function deactivate() {
 
 	// Include our action so that we may add to this later.
-	do_action( 'woo_subscribe_product_deactivate_process' );
+	do_action( 'woo_subscribe_products_deactivate_process' );
 
 	// And flush our rewrite rules.
 	flush_rewrite_rules();
