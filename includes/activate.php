@@ -10,6 +10,7 @@ namespace LiquidWeb\WooSubscribeToProducts\Activate;
 
 // Set our aliases.
 use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooSubscribeToProducts\Database as Database;
 
 /**
  * Our inital setup function when activated.
@@ -17,6 +18,9 @@ use LiquidWeb\WooSubscribeToProducts as Core;
  * @return void
  */
 function activate() {
+
+	// Run the check on the DB table.
+	Database\maybe_install_table();
 
 	// Include our action so that we may add to this later.
 	do_action( 'woo_subscribe_products_activate_process' );

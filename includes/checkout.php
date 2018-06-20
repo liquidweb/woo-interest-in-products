@@ -11,6 +11,7 @@ namespace LiquidWeb\WooSubscribeToProducts\Checkout;
 // Set our aliases.
 use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
+use LiquidWeb\WooSubscribeToProducts\Layout as Layout;
 
 /**
  * Start our engines.
@@ -66,7 +67,7 @@ function display_product_subscribe_fields() {
 
 		// Make a label and a slug.
 		$slug   = sanitize_title_with_dashes( $title, '', 'save' );
-		$label  = sprintf( __( 'Keep me informed about %s', 'woo-subscribe-to-products' ), esc_attr( $title ) );
+		$label  = Layout\get_optin_checkout_label( $title, $id );
 
 		// Wrap each one in a paragraph.
 		$build .= '<p class="form-row lw-woo-gdpr-' . esc_attr( $slug ) . '-field">';
@@ -129,7 +130,7 @@ function validate_product_subscribe_data( $data, $errors ) {
  *
  * @return void
  */
-function update_product_subscribe_data( $customer, $data ) {
+function update_user_product_subscriptions( $customer, $data ) {
 
 	// Bail without data or customer info.
 	if ( empty( $customer ) || ! is_object( $customer ) || empty( $data ) || ! is_array( $data ) ) {
