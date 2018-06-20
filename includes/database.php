@@ -13,6 +13,25 @@ use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 
 /**
+ * Start our engines.
+ */
+add_action( 'plugins_loaded', __NAMESPACE__ . '\register_table', 11 );
+
+/**
+ * Registers the table with $wpdb so the metadata api can find it.
+ *
+ * @return void
+ */
+function register_table() {
+
+	// Load the global DB.
+	global $wpdb;
+
+	// Set the messages.
+	$wpdb->wc_product_subscriptions = $wpdb->prefix . Core\TABLE_NAME;
+}
+
+/**
  * Confirm that the table itself actually exists.
  *
  * @return boolean
@@ -108,4 +127,49 @@ function install_table() {
 
 	// And return true because it exists.
 	return true;
+}
+
+/**
+ * Create a new record of a subscription.
+ *
+ * @param  integer $product_id  The product ID being purchased.
+ * @param  integer $user_id     The user ID doing the purchasing.
+ *
+ * @return integer
+ */
+function insert( $product_id = 0, $user_id = 0 ) {
+
+	// Make sure we have a product ID.
+	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
+		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Make sure we have a user ID.
+	if ( empty( $user_id ) ) {
+		return new WP_Error( 'missing_user_id', __( 'The required user ID is missing.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Call the global database.
+	global $wpdb;
+
+	// Set my insert data.
+	$insert = array( 'product_id' => $product_id, 'user_id' => $user_id, 'created' => current_time( 'mysql' ) );
+
+	// Filter our inserted data.
+	$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert );
+
+	// Run our action after it has been inserted.
+	do_action( Core\HOOK_PREFIX . 'before_insert', $insert );
+
+	// Set our format clauses
+	$format = array_fill( 0, count( $insert ), '%s' );
+
+	// Run my insert function.
+	$wpdb->insert( $wpdb->wc_product_subscriptions, $insert, $format );
+
+	// Run our action after it has been inserted.
+	do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert );
+
+	// Return the new relationship ID.
+	return $wpdb->insert_id;
 }

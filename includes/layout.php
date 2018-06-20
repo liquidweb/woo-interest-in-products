@@ -25,6 +25,6 @@ function get_optin_checkout_label( $product_title = '', $product_id = 0 ) {
 	$label  = sprintf( __( 'Keep me informed about %s', 'woo-subscribe-to-products' ), esc_attr( $product_title ) );
 
 	// Return the label, filtered.
-	return apply_filters( 'woo_subscribe_products_checkout_label', $label, $product_id, $product_title );
+	return apply_filters( Core\ACTION_PREFIX . 'checkout_label', $label, $product_id, $product_title );
 }
 

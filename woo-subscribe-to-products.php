@@ -45,13 +45,13 @@ define( __NAMESPACE__ . '\ASSETS_URL', URL . 'assets' );
 // define( __NAMESPACE__ . '\TAB_BASE', '' );
 
 // Set our custom table name.
-define( __NAMESPACE__ . '\TABLE_NAME', 'wc_subprod_relationships' );
+define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_subscriptions' );
 
 // Set the option key used to store the schema.
 define( __NAMESPACE__ . '\SCHEMA_KEY', 'woo_subscribe_products_db_version' );
 
-// Set the prefix for our hooks and filters.
-define( __NAMESPACE__ . '\ACTION_PREFIX', 'woo_subscribe_products_' );
+// Set the prefix for our actions and filters.
+define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_subscribe_products_' );
 
 // Set the meta key name for products.
 define( __NAMESPACE__ . '\PROD_META_KEY', '_product_subscribe_enabled' );

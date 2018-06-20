@@ -12,6 +12,7 @@ namespace LiquidWeb\WooSubscribeToProducts\Checkout;
 use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 use LiquidWeb\WooSubscribeToProducts\Layout as Layout;
+use LiquidWeb\WooSubscribeToProducts\Database as Database;
 
 /**
  * Start our engines.
@@ -141,7 +142,7 @@ function update_user_product_subscriptions( $customer, $data ) {
 	$products   = ! empty( $data['subscribed-products'] ) ? $data['subscribed-products'] : array();
 
 	// Update the user meta item.
-	Helpers\update_user_product_subscribe( 0, $customer, $products );
+	Database\insert( 0, $customer, $products );
 
 	// And just be done.
 	return;
