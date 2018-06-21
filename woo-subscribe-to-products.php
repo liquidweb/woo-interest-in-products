@@ -17,6 +17,9 @@
 // Declare our namespace.
 namespace LiquidWeb\WooSubscribeToProducts;
 
+// Call our CLI namespace.
+use WP_CLI;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -38,12 +41,6 @@ define( __NAMESPACE__ . '\URL', plugin_dir_url( __FILE__ ) );
 // Set our assets directory constant.
 define( __NAMESPACE__ . '\ASSETS_URL', URL . 'assets' );
 
-// Set our front menu endpoint constant.
-// define( __NAMESPACE__ . '\FRONT_VAR', '' );
-
-// Set our tab base slug constant.
-// define( __NAMESPACE__ . '\TAB_BASE', '' );
-
 // Set our custom table name.
 define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_subscriptions' );
 
@@ -55,9 +52,6 @@ define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_subscribe_products_' );
 
 // Set the meta key name for products.
 define( __NAMESPACE__ . '\PROD_META_KEY', '_product_subscribe_enabled' );
-
-// Set the meta key name for users.
-define( __NAMESPACE__ . '\USER_META_KEY', 'user_subscribed_products' );
 
 // Load the multi-use files.
 require_once __DIR__ . '/includes/helpers.php';

@@ -132,44 +132,67 @@ function install_table() {
 /**
  * Create a new record of a subscription.
  *
- * @param  integer $product_id  The product ID being purchased.
- * @param  integer $user_id     The user ID doing the purchasing.
+ * @param  integer $user_id   The user ID doing the purchasing.
+ * @param  array   $products  The array of product IDs being passed.
  *
  * @return integer
  */
-function insert( $product_id = 0, $user_id = 0 ) {
-
-	// Make sure we have a product ID.
-	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
-		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
-	}
+function insert( $user_id = 0, $products = array() ) {
 
 	// Make sure we have a user ID.
 	if ( empty( $user_id ) ) {
 		return new WP_Error( 'missing_user_id', __( 'The required user ID is missing.', 'woo-subscribe-to-products' ) );
 	}
 
+	// Make sure we have products.
+	if ( empty( $products ) || ! is_array( $products ) ) {
+		return new WP_Error( 'missing_invalid_products', __( 'The required product IDs are missing or invalid.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Run the action before doing anything.
+	do_action( Core\HOOK_PREFIX . 'before_all_inserts', $user_id, $products );
+
 	// Call the global database.
 	global $wpdb;
 
-	// Set my insert data.
-	$insert = array( 'product_id' => $product_id, 'user_id' => $user_id, 'created' => current_time( 'mysql' ) );
+	// Set our created time.
+	$create = current_time( 'mysql' );
 
-	// Filter our inserted data.
-	$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert );
+	// Loop my products and confirm each one.
+	foreach ( $products as $product_id ) {
 
-	// Run our action after it has been inserted.
-	do_action( Core\HOOK_PREFIX . 'before_insert', $insert );
+		// Make sure we have a product ID.
+		if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
+			return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
+		}
 
-	// Set our format clauses
-	$format = array( '%d', '%d', '%s' );
+		// Set my insert data.
+		$insert = array( 'product_id' => $product_id, 'user_id' => $user_id, 'created' => $create );
 
-	// Run my insert function.
-	$wpdb->insert( $wpdb->wc_product_subscriptions, $insert, $format );
+		// Filter our inserted data.
+		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $user_id, $product_id );
 
-	// Run our action after it has been inserted.
-	do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert );
+		// Run our action after it has been inserted.
+		do_action( Core\HOOK_PREFIX . 'before_insert', $insert, $user_id, $product_id );
 
-	// Return the new relationship ID.
-	return $wpdb->insert_id;
+		// Set our format clauses
+		$format = apply_filters( Core\HOOK_PREFIX . 'insert_data_format', array( '%d', '%d', '%s' ) );
+
+		// Run my insert function.
+		$wpdb->insert( $wpdb->wc_product_subscriptions, $insert, $format );
+
+		// Check for the ID and throw an error if we don't have it.
+		if ( ! $wpdb->insert_id ) {
+			return new WP_Error( 'db_insert_error', __( 'There was an error adding this to the database.', 'woo-subscribe-to-products' ) );
+		}
+
+		// Run our action after it has been inserted.
+		do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert, $user_id, $product_id );
+	}
+
+	// Run the action after doing everything.
+	do_action( Core\HOOK_PREFIX . 'after_all_inserts', $user_id, $products );
+
+	// Return true.
+	return true;
 }

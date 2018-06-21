@@ -8,6 +8,9 @@
 // Call our namepsace.
 namespace LiquidWeb\WooSubscribeToProducts;
 
+// Set our aliases.
+use LiquidWeb\WooSubscribeToProducts as Core;
+
 // Pull in the CLI items.
 use WP_CLI;
 use WP_CLI_Command;
@@ -66,7 +69,7 @@ class Commands extends WP_CLI_Command {
 		));
 
 		// Get my products.
-		$products   = WP_CLI::runcommand( 'post list --post_type=product --field=ID --format=json', $this->get_command_args() );
+		$products   = WP_CLI::runcommand( 'post list --post_type=product --post_status=publish --field=ID --format=json', $this->get_command_args() );
 
 		// Bail on empty or error.
 		if ( empty( $products ) || is_wp_error( $products ) ) {

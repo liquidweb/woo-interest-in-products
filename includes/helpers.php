@@ -12,23 +12,38 @@ namespace LiquidWeb\WooSubscribeToProducts\Helpers;
 use LiquidWeb\WooSubscribeToProducts as Core;
 
 /**
- * Manage saving the opt-in choices for a user.
+ * Check the products provided for enabled items.
  *
- * @param  integer $user_id   The user we are going to look up if no customer object is there.
- * @param  object  $customer  The customer object.
- * @param  array   $products  The field data to use in updating.
+ * @param  array $cart      The total array of cart data.
+ * @param  array $products  The enabled products.
  *
- * @return boolean
+ * @return array
  */
-function update_user_product_subscriptions( $user_id = 0, $customer, $products = array() ) {
+function filter_product_cart( $cart = array(), $products = array() ) {
 
 	// Make sure we have everything required.
-	if ( empty( $user_id ) && empty( $customer ) ) {
+	if ( empty( $cart ) || empty( $products ) ) {
 		return false;
 	}
 
-	// @@todo what to do
+	// Set an empty variable.
+	$filter = array();
 
-	// And just be done.
-	return true;
+	// Loop our cart and look for products.
+	foreach ( $cart as $key => $item ) {
+
+		// Set my ID.
+		$id = absint( $item['product_id'] );
+
+		// Check the meta.
+		$mt = get_post_meta( $id, Core\PROD_META_KEY, true );
+
+		// If we have meta, add to the data array.
+		if ( ! empty( $mt ) ) {
+			$filter[ $id ]  = get_the_title( $id );
+		}
+	}
+
+	// Return the array (or empty).
+	return ! empty( $filter ) ? $filter : false;
 }

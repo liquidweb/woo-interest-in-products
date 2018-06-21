@@ -12,6 +12,7 @@ namespace LiquidWeb\WooSubscribeToProducts\Checkout;
 use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 use LiquidWeb\WooSubscribeToProducts\Layout as Layout;
+use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
 use LiquidWeb\WooSubscribeToProducts\Database as Database;
 
 /**
@@ -34,28 +35,18 @@ function display_product_subscribe_fields() {
 		return;
 	}
 
-	// Set an empty variable.
-	$setup  = array();
+	// Get my array of enabled products.
+	$items  = Queries\get_enabled_products();
 
-	// Loop our cart and look for products.
-	foreach ( WC()->cart->get_cart_contents() as $key => $item ) {
-
-		// Set my ID.
-		$prodid = absint( $item['product_id'] );
-
-		// Check the meta.
-		$meta   = get_post_meta( $prodid, Core\PROD_META_KEY, true );
-
-		// Bail without having any meta.
-		if ( empty( $meta ) ) {
-			continue;
-		}
-
-		// Now add the ID and title to an array.
-		$setup[ $prodid ] = get_the_title( $prodid );
+	// No enabled products exist, so bail.
+	if ( empty( $items ) ) {
+		return;
 	}
 
-	// Bail without having any items.
+	// Set an empty variable.
+	$setup  = Helpers\filter_product_cart( WC()->cart->get_cart_contents(), $items );
+
+	// Bail without having any items come back.
 	if ( empty( $setup ) ) {
 		return;
 	}
@@ -152,11 +143,10 @@ function update_user_product_subscriptions( $customer_id, $data ) {
 	}
 
 	// Set my products.
-	$products   = array_map( 'absint', $data['subscribed-products'] );
+	$items  = array_map( 'absint', $data['subscribed-products'] );
 
-	// Loop the product IDs and run thge insert.
-	foreach ( $products as $product_id ) {
-		Database\insert( $customer_id, $product_id );
-	}
+	// Run the inserts.
+	$update = Database\insert( $customer_id, (array) $items );
 
+	// @@todo  handle error / empty return?
 }
