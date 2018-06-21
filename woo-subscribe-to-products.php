@@ -73,3 +73,13 @@ require_once __DIR__ . '/includes/layout.php';
 require_once __DIR__ . '/includes/queries.php';
 require_once __DIR__ . '/includes/post-meta.php';
 require_once __DIR__ . '/includes/checkout.php';
+
+// Check that we have the constant available.
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+
+	// Load our commands file.
+	require_once dirname( __FILE__ ) . '/includes/commands.php';
+
+	// And add our command.
+	WP_CLI::add_command( 'woo-subscribe-products', Commands::class );
+}

@@ -162,7 +162,7 @@ function insert( $product_id = 0, $user_id = 0 ) {
 	do_action( Core\HOOK_PREFIX . 'before_insert', $insert );
 
 	// Set our format clauses
-	$format = array_fill( 0, count( $insert ), '%s' );
+	$format = array( '%d', '%d', '%s' );
 
 	// Run my insert function.
 	$wpdb->insert( $wpdb->wc_product_subscriptions, $insert, $format );
