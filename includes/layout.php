@@ -29,7 +29,7 @@ function get_optin_checkout_label( $product_title = '', $product_id = 0 ) {
 }
 
 /**
- * Build out and return the checkboxes.
+ * Build out and return the checkboxes for the checkout.
  *
  * @param  array   $data  The array of opt-in data.
  * @param  boolean $echo  Whether to echo it out or return.
@@ -68,6 +68,53 @@ function get_optin_checkout_fields( $data = array(), $echo = false ) {
 		// Close the single paragraph.
 		$build .= '</p>';
 	}
+
+	// And echo it out if requested.
+	if ( $echo ) {
+		echo $build; // WPCS: XSS ok.
+	}
+
+	// Just return it.
+	return $build;
+}
+
+/**
+ * Build out and return the list of subscribed customers.
+ *
+ * @param  array   $customers  The array of customer IDs.
+ * @param  boolean $echo       Whether to echo it out or return.
+ *
+ * @return HTML
+ */
+function get_subscribed_customers_list( $customers = array(), $echo = false ) {
+
+	// Bail without any customers.
+	if ( empty( $customers ) || ! is_array( $customers ) ) {
+		return;
+	}
+
+	// Set an empty.
+	$build  = '';
+
+	// Begin the list output.
+	$build .= '<ol>';
+
+	// Now we loop the IDs and show them individually.
+	foreach ( $customers as $customer_id ) {
+
+		// Pull out the user object and profile link.
+		$user   = get_userdata( $customer_id );
+		$link   = get_edit_user_link( $customer_id );
+
+		// And the output.
+		$build .= '<li>';
+			$build .= '<a href="' . esc_url( $link ) . '">' . esc_html( $user->display_name ) . '</a>';
+			$build .= ' <strong>(' . esc_html__( 'ID:', 'woo-subscribe-to-products' ) . ' ' . absint( $customer_id ) . ')</strong>';
+		$build .= '</li>';
+	}
+
+	// Close the list.
+	$build .= '</ol>';
 
 	// And echo it out if requested.
 	if ( $echo ) {

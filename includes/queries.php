@@ -59,26 +59,31 @@ function get_enabled_products() {
 }
 
 /**
- * Get the users that have subscribed to a single product.
+ * Get the customers that have subscribed to a single product.
  *
  * @param  integer $product_id  The product ID to look up.
  *
  * @return array
  */
-function get_users_for_product( $product_id = 0 ) {
+function get_customers_for_product( $product_id = 0 ) {
 
 	// Make sure we have a product ID.
 	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
 		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
 	}
 
+	// Make sure we have an enabled product.
+	if ( ! Helpers\maybe_product_enabled( $product_id ) ) {
+		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-subscribe-to-products' ) );
+	}
+
 	// If we don't want the cache'd version, delete the transient first.
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		delete_transient( 'woo_product_subscribed_users' );
+		delete_transient( 'woo_product_subscribed_customers' );
 	}
 
 	// Check the transient.
-	if ( false === $users = get_transient( 'woo_product_subscribed_users' )  ) {
+	if ( false === $customers = get_transient( 'woo_product_subscribed_customers' )  ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -102,14 +107,14 @@ function get_users_for_product( $product_id = 0 ) {
 		}
 
 		// Make sure they're unique.
-		$users  = array_unique( $query );
+		$customers  = array_unique( $query );
 
 		// Set our transient with our data.
-		set_transient( 'woo_product_subscribed_users', $users, HOUR_IN_SECONDS );
+		set_transient( 'woo_product_subscribed_customers', $customers, HOUR_IN_SECONDS );
 	}
 
 	// Return the array of user IDs, filtering out the duplicates.
-	return $users;
+	return $customers;
 }
 
 /**

@@ -12,6 +12,28 @@ namespace LiquidWeb\WooSubscribeToProducts\Helpers;
 use LiquidWeb\WooSubscribeToProducts as Core;
 
 /**
+ * Check a product ID to see if it enabled.
+ *
+ * @param  integer $product_id  The ID of the product.
+ * @param  boolean $strings     Optional return of yes/no strings.
+ *
+ * @return mixed
+ */
+function maybe_product_enabled( $product_id = 0, $strings = false ) {
+
+	// Check the meta.
+	$meta   = get_post_meta( $product_id, Core\PROD_META_KEY, true );
+
+	// Return the string variant if requested.
+	if ( $strings ) {
+		return ! empty( $meta ) ? 'yes' : 'no';
+	}
+
+	// Return the boolean result.
+	return ! empty( $meta ) ? true : false;
+}
+
+/**
  * Check the products provided for enabled items.
  *
  * @param  array $cart    The total array of cart data.
