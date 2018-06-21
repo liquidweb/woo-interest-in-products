@@ -36,15 +36,15 @@ function display_product_subscribe_fields() {
 	}
 
 	// Get my array of enabled products.
-	$items  = Queries\get_enabled_products();
+	$enable = Queries\get_enabled_products();
 
 	// No enabled products exist, so bail.
-	if ( empty( $items ) ) {
+	if ( empty( $enable ) ) {
 		return;
 	}
 
 	// Set an empty variable.
-	$setup  = Helpers\filter_product_cart( WC()->cart->get_cart_contents(), $items );
+	$setup  = Helpers\filter_product_cart( WC()->cart->get_cart_contents(), $enable );
 
 	// Bail without having any items come back.
 	if ( empty( $setup ) ) {

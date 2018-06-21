@@ -14,15 +14,15 @@ use LiquidWeb\WooSubscribeToProducts as Core;
 /**
  * Check the products provided for enabled items.
  *
- * @param  array $cart      The total array of cart data.
- * @param  array $products  The enabled products.
+ * @param  array $cart    The total array of cart data.
+ * @param  array $enable  The enabled products.
  *
  * @return array
  */
-function filter_product_cart( $cart = array(), $products = array() ) {
+function filter_product_cart( $cart = array(), $enable = array() ) {
 
 	// Make sure we have everything required.
-	if ( empty( $cart ) || empty( $products ) ) {
+	if ( empty( $cart ) || empty( $enable ) ) {
 		return false;
 	}
 
@@ -35,11 +35,8 @@ function filter_product_cart( $cart = array(), $products = array() ) {
 		// Set my ID.
 		$id = absint( $item['product_id'] );
 
-		// Check the meta.
-		$mt = get_post_meta( $id, Core\PROD_META_KEY, true );
-
 		// If we have meta, add to the data array.
-		if ( ! empty( $mt ) ) {
+		if ( in_array( $id, $enable ) ) {
 			$filter[ $id ]  = get_the_title( $id );
 		}
 	}
