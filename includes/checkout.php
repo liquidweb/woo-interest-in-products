@@ -43,16 +43,16 @@ function display_product_subscribe_fields() {
 		return;
 	}
 
-	// Set an empty variable.
-	$setup  = Helpers\filter_product_cart( WC()->cart->get_cart_contents(), $enable );
+	// Filter my cart products.
+	$filter = Helpers\filter_product_cart( WC()->cart->get_cart_contents(), $enable );
 
 	// Bail without having any items come back.
-	if ( empty( $setup ) ) {
+	if ( ! $filter ) {
 		return;
 	}
 
 	// And spit out the fields.
-	Layout\get_optin_checkout_fields( $setup, true );
+	Layout\get_optin_checkout_field( $filter, true );
 }
 
 /**
@@ -69,8 +69,11 @@ function merge_product_subscribe_data( $data ) {
 		return $data;
 	}
 
+	// Set my IDs.
+	$ids    = explode( ',', $_POST['woo-product-subscribe'] );
+
 	// Clean each entry.
-	$items  = array_map( 'absint', $_POST['woo-product-subscribe'] );
+	$items  = array_map( 'absint', $ids );
 
 	// Merge our opt-in items to the overall data array and return it.
 	return array_merge( $data, array( 'subscribed-products' => $items ) );
@@ -104,17 +107,17 @@ function validate_product_subscribe_data( $data, $errors ) {
 			$errors->add( 'invalid_product_id', $error_text );
 		}
 
-		// Now check the meta.
-		$meta   = get_post_meta( $product_id, Core\PROD_META_KEY, true );
+		// Now check to make sure it's enabled..
+		$enable = Helpers\maybe_product_enabled( $product_id );
 
 		// Now make sure it is an enabled product.
-		if ( ! $meta ) {
+		if ( ! $enable ) {
 
 			// Set our error message.
 			$error_text = sprintf( __( 'Signups have not been enabled for product ID %d', 'woo-subscribe-to-products' ), absint( $product_id ) );
 
 			// And add my error.
-			$errors->add( 'disabled_product_id', $error_text );
+			$errors->add( 'product_not_enabled', $error_text );
 		}
 	}
 

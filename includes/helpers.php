@@ -49,7 +49,7 @@ function filter_product_cart( $cart = array(), $enable = array() ) {
 	}
 
 	// Set an empty variable.
-	$filter = array();
+	$data   = array();
 
 	// Loop our cart and look for products.
 	foreach ( $cart as $key => $item ) {
@@ -59,10 +59,10 @@ function filter_product_cart( $cart = array(), $enable = array() ) {
 
 		// If we have meta, add to the data array.
 		if ( in_array( $id, $enable ) ) {
-			$filter[ $id ]  = get_the_title( $id );
+			$data[] = $id;
 		}
 	}
 
 	// Return the array (or empty).
-	return ! empty( $filter ) ? $filter : false;
+	return ! empty( $data ) ? $data : false;
 }
