@@ -134,7 +134,7 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
  *
  * @return array
  */
-function get_products_for_user( $customer_id = 0, $flush = false ) {
+function get_products_for_customer( $customer_id = 0, $flush = false ) {
 
 	// Make sure we have a user ID.
 	if ( empty( $customer_id ) ) {
