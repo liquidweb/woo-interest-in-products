@@ -19,7 +19,7 @@ use LiquidWeb\WooSubscribeToProducts as Core;
 function deactivate() {
 
 	// Include our action so that we may add to this later.
-	do_action( 'woo_subscribe_products_deactivate_process' );
+	do_action( Core\HOOK_PREFIX . 'deactivate_process' );
 
 	// And flush our rewrite rules.
 	flush_rewrite_rules();

@@ -50,6 +50,9 @@ function get_optin_checkout_field( $products = array(), $echo = false ) {
 		// And close the tag.
 		$build .= '</label>';
 
+		// Add a nonce field because nonce fields.
+		$build .= wp_nonce_field( 'customer_prodsub_nonce_action', 'customer_prodsub_nonce_name', false, false );
+
 	// Close the single paragraph.
 	$build .= '</p>';
 

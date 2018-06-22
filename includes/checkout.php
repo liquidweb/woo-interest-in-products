@@ -30,6 +30,11 @@ add_action( 'woocommerce_checkout_update_user_meta', __NAMESPACE__ . '\update_us
  */
 function display_product_subscribe_fields() {
 
+	// Don't run any of this on a guest user.
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
 	// Bail without some cart action.
 	if ( ! WC()->cart->get_cart_contents() ) {
 		return;
@@ -64,16 +69,26 @@ function display_product_subscribe_fields() {
  */
 function merge_product_subscribe_data( $data ) {
 
+	// Don't run any of this on a guest user.
+	if ( ! is_user_logged_in() ) {
+		return $data;
+	}
+
 	// Bail if we have no posted data.
 	if ( empty( $_POST['woo-product-subscribe'] ) ) { // WPCS: CSRF ok.
 		return $data;
 	}
 
-	// Set my IDs.
-	$ids    = explode( ',', $_POST['woo-product-subscribe'] );
+	// Check to see if our nonce was provided.
+	if ( empty( $_POST['customer_prodsub_nonce_name'] ) || ! wp_verify_nonce( $_POST['customer_prodsub_nonce_name'], 'customer_prodsub_nonce_action' ) ) {
+		return $data;
+	}
+
+	// Explode the string of IDs into an array..
+	$array  = explode( ',', sanitize_text_field( $_POST['woo-product-subscribe'] ) );
 
 	// Clean each entry.
-	$items  = array_map( 'absint', $ids );
+	$items  = array_map( 'absint', $array );
 
 	// Merge our opt-in items to the overall data array and return it.
 	return array_merge( $data, array( 'subscribed-products' => $items ) );
@@ -88,6 +103,11 @@ function merge_product_subscribe_data( $data ) {
  * @return mixed
  */
 function validate_product_subscribe_data( $data, $errors ) {
+
+	// Don't run any of this on a guest user.
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
 
 	// Bail if we have no subscriber data.
 	if ( empty( $data['subscribed-products'] ) ) {
@@ -134,6 +154,11 @@ function validate_product_subscribe_data( $data, $errors ) {
  * @return void
  */
 function update_user_product_subscriptions( $customer_id, $data ) {
+
+	// Don't run any of this on a guest user.
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
 
 	// Bail without data or customer info.
 	if ( empty( $customer_id ) || empty( $data ) || ! is_array( $data ) ) {

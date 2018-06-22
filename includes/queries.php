@@ -13,19 +13,24 @@ use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 
 /**
- * Get all the product IDs that have the optin.
+ * Get all the product IDs that have the signup enabled.
+ *
+ * @param  boolean $flush  Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_enabled_products() {
+function get_enabled_products( $flush = false ) {
+
+	// Set my transient key.
+	$ky = 'woo_product_subscription_ids';
 
 	// If we don't want the cache'd version, delete the transient first.
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		delete_transient( 'woo_product_subscription_ids' );
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
 	}
 
 	// Check the transient.
-	if ( false === $items = get_transient( 'woo_product_subscription_ids' )  ) {
+	if ( false === $items = get_transient( $ky )  ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -51,7 +56,7 @@ function get_enabled_products() {
 		$items  = array_unique( $query );
 
 		// Set our transient with our data.
-		set_transient( 'woo_product_subscription_ids', $items, HOUR_IN_SECONDS );
+		set_transient( $ky, $items, HOUR_IN_SECONDS );
 	}
 
 	// Return the array of product IDs, filtering out the duplicates.
@@ -62,10 +67,11 @@ function get_enabled_products() {
  * Get the customers that have subscribed to a single product.
  *
  * @param  integer $product_id  The product ID to look up.
+ * @param  boolean $flush       Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_customers_for_product( $product_id = 0 ) {
+function get_customers_for_product( $product_id = 0, $flush = false ) {
 
 	// Make sure we have a product ID.
 	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
@@ -77,13 +83,16 @@ function get_customers_for_product( $product_id = 0 ) {
 		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-subscribe-to-products' ) );
 	}
 
+	// Set my transient key.
+	$ky = 'woo_product_subscribed_customers';
+
 	// If we don't want the cache'd version, delete the transient first.
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		delete_transient( 'woo_product_subscribed_customers' );
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
 	}
 
 	// Check the transient.
-	if ( false === $customers = get_transient( 'woo_product_subscribed_customers' )  ) {
+	if ( false === $customers = get_transient( $ky )  ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -93,7 +102,7 @@ function get_customers_for_product( $product_id = 0 ) {
 			SELECT   user_id
 			FROM     $wpdb->wc_product_subscriptions
 			WHERE    product_id = '%d'
-			ORDER BY created DESC
+			ORDER BY created ASC
 		", absint( $product_id ) );
 
 		// Process the query.
@@ -110,7 +119,7 @@ function get_customers_for_product( $product_id = 0 ) {
 		$customers  = array_unique( $query );
 
 		// Set our transient with our data.
-		set_transient( 'woo_product_subscribed_customers', $customers, HOUR_IN_SECONDS );
+		set_transient( $ky, $customers, HOUR_IN_SECONDS );
 	}
 
 	// Return the array of user IDs, filtering out the duplicates.
@@ -118,26 +127,30 @@ function get_customers_for_product( $product_id = 0 ) {
 }
 
 /**
- * Get the products that have subscribed by a user.
+ * Get the products that have subscribed by a customer.
  *
- * @param  integer $user_id  The user ID to look up.
+ * @param  integer $customer_id  The user ID to look up.
+ * @param  boolean $flush        Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_products_for_user( $user_id = 0 ) {
+function get_products_for_user( $customer_id = 0, $flush = false ) {
 
 	// Make sure we have a user ID.
-	if ( empty( $user_id ) ) {
-		return new WP_Error( 'missing_user_id', __( 'The required user ID is missing.', 'woo-subscribe-to-products' ) );
+	if ( empty( $customer_id ) ) {
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
 	}
 
+	// Set my transient key.
+	$ky = 'woo_customer_subscribed_products';
+
 	// If we don't want the cache'd version, delete the transient first.
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		delete_transient( 'woo_user_subscribed_products' );
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
 	}
 
 	// Check the transient.
-	if ( false === $products = get_transient( 'woo_user_subscribed_products' )  ) {
+	if ( false === $products = get_transient( $ky )  ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -147,8 +160,8 @@ function get_products_for_user( $user_id = 0 ) {
 			SELECT   product_id
 			FROM     $wpdb->wc_product_subscriptions
 			WHERE    user_id = '%d'
-			ORDER BY created DESC
-		", absint( $user_id ) );
+			ORDER BY created ASC
+		", absint( $customer_id ) );
 
 		// Process the query.
 		$query  = $wpdb->get_col( $setup );
@@ -164,7 +177,7 @@ function get_products_for_user( $user_id = 0 ) {
 		$products   = array_unique( $query );
 
 		// Set our transient with our data.
-		set_transient( 'woo_user_subscribed_products', $products, HOUR_IN_SECONDS );
+		set_transient( $ky, $products, HOUR_IN_SECONDS );
 	}
 
 	// Return the array of product IDs, filtering out the duplicates.

@@ -45,7 +45,7 @@ function maybe_table_exists() {
 	$table  = $wpdb->prefix . Core\TABLE_NAME;
 
 	// Run the lookup.
-	$lookup = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+	$lookup = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) );
 
 	// We have the table, no need to install it.
 	$wpdb->get_var( $lookup ) === $table ? true : false;

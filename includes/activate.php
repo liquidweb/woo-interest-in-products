@@ -23,7 +23,7 @@ function activate() {
 	Database\maybe_install_table();
 
 	// Include our action so that we may add to this later.
-	do_action( 'woo_subscribe_products_activate_process' );
+	do_action( Core\HOOK_PREFIX . 'activate_process' );
 
 	// And flush our rewrite rules.
 	flush_rewrite_rules();

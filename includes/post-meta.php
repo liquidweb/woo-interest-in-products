@@ -115,18 +115,21 @@ function save_product_subscribe( $post_id ) {
 		return;
 	}
 
-  	// Get our product.
-  	$prod   = wc_get_product( $post_id );
+	// Get our product.
+	$prod   = wc_get_product( $post_id );
 
-  	// Handle the meta based on what was passed.
-  	if ( ! empty( $_POST['include_product_subscribe'] ) ) {
-  		$prod->update_meta_data( Core\PROD_META_KEY, true );
-  	} else {
-  		$prod->delete_meta_data( Core\PROD_META_KEY );
-  	}
+	// Handle the meta based on what was passed.
+	if ( ! empty( $_POST['include_product_subscribe'] ) ) {
+		$prod->update_meta_data( Core\PROD_META_KEY, true );
+	} else {
+		$prod->delete_meta_data( Core\PROD_META_KEY );
+	}
 
-  	// And save the product.
-  	$prod->save();
+	// And save the product.
+	$prod->save();
+
+	// Delete the transient storing the enabled products.
+	delete_transient( 'woo_product_subscription_ids' );
 
 	// @@todo add the product ID to some other option?
 }
