@@ -52,22 +52,22 @@ function maybe_table_exists() {
 }
 
 /**
- * Confirm that the table itself actually exists.
+ * Install the table if it doesn't already exist.
  *
- * @return boolean
+ * @return void
  */
 function maybe_install_table() {
 
 	// Run the check.
 	$check  = maybe_table_exists();
 
-	// If the table exists, just bail.
-	if ( $check ) {
-		rturn;
+	// If we don't have the table, run the install.
+	if ( ! $check ) {
+		install_table();
 	}
 
-	// Run the install setup.
-	install_table();
+	// @@todo some sort of return?
+	return;
 }
 
 /**
@@ -104,8 +104,6 @@ function install_table() {
 
 	// Set our various table names.
 	$table_name = $wpdb->prefix . Core\TABLE_NAME;
-	$post_table = $wpdb->posts;
-	$user_table = $wpdb->users;
 
 	// Write the SQL syntax.
 	$setup  = "
