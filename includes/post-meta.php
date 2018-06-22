@@ -17,7 +17,7 @@ use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
 /**
  * Start our engines.
  */
-add_action( 'add_meta_boxes_product', __NAMESPACE__ . '\load_subscribed_users_metabox', 11 );
+add_action( 'add_meta_boxes_product', __NAMESPACE__ . '\load_subscribed_customers_metabox', 11 );
 add_action( 'woocommerce_product_options_advanced', __NAMESPACE__ . '\display_product_subscribe_checkbox' );
 add_action( 'woocommerce_process_product_meta', __NAMESPACE__ . '\save_product_subscribe' );
 
@@ -28,7 +28,7 @@ add_action( 'woocommerce_process_product_meta', __NAMESPACE__ . '\save_product_s
  *
  * @return void
  */
-function load_subscribed_users_metabox( $post ) {
+function load_subscribed_customers_metabox( $post ) {
 
 	// Bail if we don't have an enabled product.
 	if ( ! Helpers\maybe_product_enabled( $post->ID ) ) {
@@ -36,7 +36,7 @@ function load_subscribed_users_metabox( $post ) {
 	}
 
 	// Load the box.
-	add_meta_box( 'list-product-subs', __( 'Subscribed Users', 'woo-subscribe-to-products' ), __NAMESPACE__ . '\display_subscribed_customers', 'product', 'side', 'core' );
+	add_meta_box( 'list-product-subs', __( 'Subscribed Customers', 'woo-subscribe-to-products' ), __NAMESPACE__ . '\display_subscribed_customers', 'product', 'side', 'default' );
 }
 
 /**

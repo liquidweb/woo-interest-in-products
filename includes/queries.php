@@ -99,7 +99,7 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 
 		// Set up our query.
 		$setup  = $wpdb->prepare("
-			SELECT   user_id
+			SELECT   customer_id
 			FROM     $wpdb->wc_product_subscriptions
 			WHERE    product_id = '%d'
 			ORDER BY created ASC
@@ -159,7 +159,7 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 		$setup  = $wpdb->prepare("
 			SELECT   product_id
 			FROM     $wpdb->wc_product_subscriptions
-			WHERE    user_id = '%d'
+			WHERE    customer_id = '%d'
 			ORDER BY created ASC
 		", absint( $customer_id ) );
 

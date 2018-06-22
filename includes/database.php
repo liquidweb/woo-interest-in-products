@@ -110,11 +110,11 @@ function install_table() {
 		CREATE TABLE {$table_name} (
 			relationship_id bigint(20) NOT NULL AUTO_INCREMENT,
 			product_id bigint(20) NOT NULL,
-			user_id bigint(20) NOT NULL,
+			customer_id bigint(20) NOT NULL,
 			created datetime NOT NULL,
 		PRIMARY KEY  (relationship_id),
 		KEY product_id (product_id),
-		KEY user_id (user_id)
+		KEY customer_id (customer_id)
 	) $char_coll;";
 
 	// Create the actual table.
@@ -130,16 +130,16 @@ function install_table() {
 /**
  * Create a new record of a subscription.
  *
- * @param  integer $user_id   The user ID doing the purchasing.
- * @param  array   $products  The array of product IDs being passed.
+ * @param  integer $customer_id  The customer ID doing the purchasing.
+ * @param  array   $products     The array of product IDs being passed.
  *
  * @return integer
  */
-function insert( $user_id = 0, $products = array() ) {
+function insert( $customer_id = 0, $products = array() ) {
 
-	// Make sure we have a user ID.
-	if ( empty( $user_id ) ) {
-		return new WP_Error( 'missing_user_id', __( 'The required user ID is missing.', 'woo-subscribe-to-products' ) );
+	// Make sure we have a customer ID.
+	if ( empty( $customer_id ) ) {
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
 	}
 
 	// Make sure we have products.
@@ -148,7 +148,7 @@ function insert( $user_id = 0, $products = array() ) {
 	}
 
 	// Run the action before doing anything.
-	do_action( Core\HOOK_PREFIX . 'before_all_inserts', $user_id, $products );
+	do_action( Core\HOOK_PREFIX . 'before_all_inserts', $customer_id, $products );
 
 	// Call the global database.
 	global $wpdb;
@@ -165,13 +165,13 @@ function insert( $user_id = 0, $products = array() ) {
 		}
 
 		// Set my insert data.
-		$insert = array( 'product_id' => $product_id, 'user_id' => $user_id, 'created' => $create );
+		$insert = array( 'product_id' => $product_id, 'customer_id' => $customer_id, 'created' => $create );
 
 		// Filter our inserted data.
-		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $user_id, $product_id );
+		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $customer_id, $product_id );
 
 		// Run our action after it has been inserted.
-		do_action( Core\HOOK_PREFIX . 'before_insert', $insert, $user_id, $product_id );
+		do_action( Core\HOOK_PREFIX . 'before_insert', $insert, $customer_id, $product_id );
 
 		// Set our format clauses
 		$format = apply_filters( Core\HOOK_PREFIX . 'insert_data_format', array( '%d', '%d', '%s' ) );
@@ -185,12 +185,28 @@ function insert( $user_id = 0, $products = array() ) {
 		}
 
 		// Run our action after it has been inserted.
-		do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert, $user_id, $product_id );
+		do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert, $customer_id, $product_id );
 	}
 
 	// Run the action after doing everything.
-	do_action( Core\HOOK_PREFIX . 'after_all_inserts', $user_id, $products );
+	do_action( Core\HOOK_PREFIX . 'after_all_inserts', $customer_id, $products );
 
 	// Return true.
 	return true;
+}
+
+/**
+ * Delete an existing subscription.
+ *
+ * @param  integer $customer_id   The customer ID tied to the subscription.
+ *
+ * @return void
+ */
+function delete( $customer_id = 0 ) {
+
+	// Call the global database.
+	global $wpdb;
+
+	// Run my delete function.
+	$wpdb->delete( $wpdb->wc_product_subscriptions, array( 'customer_id' => absint( $customer_id ) ) );
 }

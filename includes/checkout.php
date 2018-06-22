@@ -21,7 +21,7 @@ use LiquidWeb\WooSubscribeToProducts\Database as Database;
 add_action( 'woocommerce_review_order_before_submit', __NAMESPACE__ . '\display_product_subscribe_fields' );
 add_filter( 'woocommerce_checkout_posted_data', __NAMESPACE__ . '\merge_product_subscribe_data' );
 add_action( 'woocommerce_after_checkout_validation', __NAMESPACE__ . '\validate_product_subscribe_data', 10, 2 );
-add_action( 'woocommerce_checkout_update_user_meta', __NAMESPACE__ . '\update_user_product_subscriptions', 10, 2 );
+add_action( 'woocommerce_checkout_update_user_meta', __NAMESPACE__ . '\update_customer_product_subscriptions', 10, 2 );
 
 /**
  * Add our new opt-in boxes to the checkout.
@@ -146,14 +146,14 @@ function validate_product_subscribe_data( $data, $errors ) {
 }
 
 /**
- * Update the opt-in field choices for the user.
+ * Update the opt-in field choices for the customer.
  *
  * @param  integer $customer_id  The WooCommerce customer ID.
  * @param  array   $data         The post data from the order.
  *
  * @return void
  */
-function update_user_product_subscriptions( $customer_id, $data ) {
+function update_customer_product_subscriptions( $customer_id, $data ) {
 
 	// Don't run any of this on a guest user.
 	if ( ! is_user_logged_in() ) {
