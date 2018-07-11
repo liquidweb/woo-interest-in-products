@@ -45,11 +45,15 @@ function get_enabled_products( $flush = false ) {
 		// Process the query.
 		$query  = $wpdb->get_col( $setup );
 
-		// If we came back false, return the error.
+		// If the query didn't work, handle it.
 		if ( ! $query ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
-			return ! $wp_error ? false : new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
 		}
 
 		// Make sure they're unique.
@@ -84,7 +88,7 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 	}
 
 	// Set my transient key.
-	$ky = 'woo_product_subscribed_customers';
+	$ky = 'woo_product_subscribed_customers_' . absint( $product_id );
 
 	// If we don't want the cache'd version, delete the transient first.
 	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -99,24 +103,28 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 
 		// Set up our query.
 		$setup  = $wpdb->prepare("
-			SELECT   customer_id
+			SELECT   *
 			FROM     $wpdb->wc_product_subscriptions
 			WHERE    product_id = '%d'
 			ORDER BY created ASC
 		", absint( $product_id ) );
 
 		// Process the query.
-		$query  = $wpdb->get_col( $setup );
+		$query  = $wpdb->get_results( $setup, ARRAY_A );
 
-		// If we came back false, return the error.
+		// If we came back empty, check for an error return.
 		if ( ! $query ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
-			return ! $wp_error ? false : new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
 		}
 
 		// Make sure they're unique.
-		$customers  = array_unique( $query );
+		$customers  = Helpers\sanitize_text_recursive( $query );
 
 		// Set our transient with our data.
 		set_transient( $ky, $customers, HOUR_IN_SECONDS );
@@ -142,7 +150,7 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 	}
 
 	// Set my transient key.
-	$ky = 'woo_customer_subscribed_products';
+	$ky = 'woo_customer_subscribed_products_' . absint( $customer_id );
 
 	// If we don't want the cache'd version, delete the transient first.
 	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -157,24 +165,28 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 
 		// Set up our query.
 		$setup  = $wpdb->prepare("
-			SELECT   product_id
+			SELECT   *
 			FROM     $wpdb->wc_product_subscriptions
 			WHERE    customer_id = '%d'
 			ORDER BY created ASC
 		", absint( $customer_id ) );
 
 		// Process the query.
-		$query  = $wpdb->get_col( $setup );
+		$query  = $wpdb->get_results( $setup, ARRAY_A );
 
 		// If we came back false, return the error.
 		if ( ! $query ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
-			return ! $wp_error ? false : new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
 		}
 
 		// Make sure they're unique.
-		$products   = array_unique( $query );
+		$products   = Helpers\sanitize_text_recursive( $query );
 
 		// Set our transient with our data.
 		set_transient( $ky, $products, HOUR_IN_SECONDS );

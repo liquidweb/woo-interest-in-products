@@ -61,6 +61,9 @@ function display_subscribed_customers( $post ) {
 		return;
 	}
 
+	// Clean up the list we wanna pass.
+	$customers  = wp_list_pluck( $customers, 'customer_id' );
+
 	// We have customers, so lets set up a list.
 	Layout\get_subscribed_customers_list( $customers, true );
 }

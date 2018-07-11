@@ -176,5 +176,10 @@ function update_customer_product_subscriptions( $customer_id, $data ) {
 	// Run the inserts.
 	$update = Database\insert( $customer_id, (array) $items );
 
+	// Handle our potential WP Error return.
+	if ( is_wp_error( $update ) ) {
+
+	}
+
 	// @@todo  handle error / empty return?
 }

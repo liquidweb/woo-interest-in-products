@@ -42,7 +42,7 @@ function maybe_table_exists() {
 	global $wpdb;
 
 	// Set my table name.
-	$table  = $wpdb->prefix . Core\TABLE_NAME;
+	$table  = $wpdb->wc_product_subscriptions;
 
 	// Run the lookup.
 	$lookup = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) );
@@ -79,7 +79,7 @@ function maybe_update_table() {
 
 	// We're already updated and current, so nothing here.
 	if ( (int) get_option( Core\SCHEMA_KEY ) === (int) Core\DB_VERS ) {
-		return false;
+		return;
 	}
 
 	// Run the install setup.
@@ -171,7 +171,7 @@ function insert( $customer_id = 0, $products = array() ) {
 		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $customer_id, $product_id );
 
 		// Run our action after it has been inserted.
-		do_action( Core\HOOK_PREFIX . 'before_insert', $insert, $customer_id, $product_id );
+		do_action( Core\HOOK_PREFIX . 'before_single_insert', $insert, $customer_id, $product_id );
 
 		// Set our format clauses
 		$format = apply_filters( Core\HOOK_PREFIX . 'insert_data_format', array( '%d', '%d', '%s' ) );
@@ -185,7 +185,7 @@ function insert( $customer_id = 0, $products = array() ) {
 		}
 
 		// Run our action after it has been inserted.
-		do_action( Core\HOOK_PREFIX . 'after_insert', $wpdb->insert_id, $insert, $customer_id, $product_id );
+		do_action( Core\HOOK_PREFIX . 'after_single_insert', $wpdb->insert_id, $insert, $customer_id, $product_id );
 	}
 
 	// Run the action after doing everything.
@@ -196,17 +196,54 @@ function insert( $customer_id = 0, $products = array() ) {
 }
 
 /**
- * Delete an existing subscription.
+ * Delete all existing subscriptions for a customer.
  *
- * @param  integer $customer_id   The customer ID tied to the subscription.
+ * @param  integer $customer_id  The customer ID tied to the subscription.
  *
  * @return void
  */
-function delete( $customer_id = 0 ) {
+function delete_by_customer( $customer_id = 0 ) {
+
+	// Make sure we have a customer ID.
+	if ( empty( $customer_id ) ) {
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
+	}
 
 	// Call the global database.
 	global $wpdb;
 
 	// Run my delete function.
-	$wpdb->delete( $wpdb->wc_product_subscriptions, array( 'customer_id' => absint( $customer_id ) ) );
+	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'customer_id' => absint( $customer_id ) ) );
+
+	// Delete the transient tied to the user.
+	delete_transient( 'woo_customer_subscribed_products_' . absint( $customer_id ) );
+}
+
+/**
+ * Delete all existing customers for a product.
+ *
+ * @param  integer $product_id  The product ID tied to the customers.
+ *
+ * @return void
+ */
+function delete_by_product( $product_id = 0 ) {
+
+	// Make sure we have a product ID.
+	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
+		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Make sure we have an enabled product.
+	if ( ! Helpers\maybe_product_enabled( $product_id ) ) {
+		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Call the global database.
+	global $wpdb;
+
+	// Run my delete function.
+	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'product_id' => absint( $product_id ) ) );
+
+	// Delete the transient tied to the user.
+	delete_transient( 'woo_product_subscribed_customers_' . absint( $product_id ) );
 }

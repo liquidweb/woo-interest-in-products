@@ -66,3 +66,62 @@ function filter_product_cart( $cart = array(), $enable = array() ) {
 	// Return the array (or empty).
 	return ! empty( $data ) ? $data : false;
 }
+
+/**
+ * Return our base link, with function fallbacks.
+ *
+ * @return string
+ */
+function get_admin_menu_link() {
+
+	// Bail if we aren't on the admin side.
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	// Build out the link if we don't have our function.
+	if ( ! function_exists( 'menu_page_url' ) ) {
+
+		// Set my args.
+		$args   = array( 'post_type' => 'product', 'page' => Core\MENU_SLUG );
+
+		// Return the link with our args.
+		return add_query_arg( $args, admin_url( 'edit.php' ) );
+	}
+
+	// Return using the function.
+	return menu_page_url( Core\MENU_SLUG, false );
+}
+
+/**
+ * Set up a recursive callback for multi-dimensional text arrays.
+ *
+ * @param  array   $input   The data array.
+ * @param  boolean $filter  Whether to filter the empty values out.
+ *
+ * @return array
+ */
+function sanitize_text_recursive( $input, $filter = false ) {
+
+	// Set our base output.
+	$output = array();
+
+	// Loop the initial data input set.
+	// If our data is an array, kick it again.
+	foreach ( $input as $key => $data ) {
+
+		// Handle the setup.
+		$setup  = is_array( $data ) ? array_map( 'sanitize_text_field', $data ) : sanitize_text_field( $data );
+
+		// Skip if are empty and said no filter.
+		if ( empty( $setup ) && ! empty( $filter ) ) {
+			continue;
+		}
+
+		// Add the setup to the data array.
+		$output[ $key ] = $setup;
+	}
+
+	// Return the entire set.
+	return $output;
+}

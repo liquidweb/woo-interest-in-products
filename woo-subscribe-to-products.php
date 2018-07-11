@@ -41,14 +41,17 @@ define( __NAMESPACE__ . '\URL', plugin_dir_url( __FILE__ ) );
 // Set our assets directory constant.
 define( __NAMESPACE__ . '\ASSETS_URL', URL . 'assets' );
 
+// Set our tab base slug constant.
+define( __NAMESPACE__ . '\MENU_SLUG', 'single-product-subs' );
+
 // Set our custom table name.
 define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_subscriptions' );
 
-// Set the option key used to store the schema.
-define( __NAMESPACE__ . '\SCHEMA_KEY', 'woo_subscribe_products_db_version' );
-
 // Set the prefix for our actions and filters.
 define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_subscribe_products_' );
+
+// Set the option key used to store the schema.
+define( __NAMESPACE__ . '\SCHEMA_KEY', HOOK_PREFIX . 'db_version' );
 
 // Set the meta key name for products.
 define( __NAMESPACE__ . '\PROD_META_KEY', '_product_subscribe_enabled' );
@@ -67,6 +70,9 @@ require_once __DIR__ . '/includes/layout.php';
 require_once __DIR__ . '/includes/queries.php';
 require_once __DIR__ . '/includes/post-meta.php';
 require_once __DIR__ . '/includes/checkout.php';
+require_once __DIR__ . '/includes/table-views.php';
+require_once __DIR__ . '/includes/settings-tab.php';
+
 
 // Check that we have the constant available.
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
