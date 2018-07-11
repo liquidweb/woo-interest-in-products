@@ -154,7 +154,10 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 
 		// Make a basic array of the actions we wanna include.
-		$setup  = array( 'wc_product_subs_unsubscribe' => __( 'Unsubscribe', 'woo-subscribe-to-products' ) );
+		$setup  = array(
+			'wc_product_subs_unsubscribe' => __( 'Unsubscribe', 'woo-subscribe-to-products' ),
+			'wc_product_subs_export'      => __( 'Export', 'woo-subscribe-to-products' )
+		);
 
 		// Return it filtered.
 		return apply_filters( Core\HOOK_PREFIX . 'table_bulk_actions', $setup );
@@ -168,7 +171,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	protected function process_bulk_action() {
 
 		// Bail if we aren't on the page.
-		if ( empty( $this->current_action() ) || 'wc_product_subs_unsubscribe' !== $this->current_action() ) {
+		if ( empty( $this->current_action() ) || ! in_array( $this->current_action(), array_keys( $this->get_bulk_actions() ) ) ) {
 			return;
 		}
 
@@ -190,6 +193,38 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		// Set and sanitize my IDs.
 		$relationship_ids   = array_map( 'absint', $_POST['wc_product_subs_relationship_ids'] );
 
+		// Handle my different bulk actions.
+		switch ( $this->current_action() ) {
+
+			case 'wc_product_subs_unsubscribe' :
+				$this->process_bulk_unsubscribe( $relationship_ids );
+				break;
+
+			case 'wc_product_subs_export' :
+				$this->process_bulk_export( $relationship_ids );
+				break;
+
+			// End all case breaks.
+		}
+
+		// Got to the end? Why?
+		Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'unknown' ) );
+	}
+
+	/**
+	 * Handle the unsubscribe bulk action.
+	 *
+	 * @param  array  $relationship_ids  The IDs requested via bulk.
+	 *
+	 * @return void
+	 */
+	private function process_bulk_unsubscribe( $relationship_ids = array() ) {
+
+		// Bail if no relationship IDs were passed.
+		if ( empty( $relationship_ids ) ) {
+			return false;
+		}
+
 		// Now loop and kill each one.
 		foreach ( $relationship_ids as $relationship_id ) {
 			Database\delete_by_relationship( $relationship_id );
@@ -207,6 +242,24 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Redirect to the success.
 		Helpers\admin_page_redirect( array( 'success' => 1, 'action' => 'unsubscribed', 'count' => count( $relationship_ids ) ) );
+	}
+
+	/**
+	 * Handle the export bulk action.
+	 *
+	 * @param  array  $relationship_ids  The IDs requested via bulk.
+	 *
+	 * @return void
+	 */
+	private function process_bulk_export( $relationship_ids = array() ) {
+
+		// Bail if no relationship IDs were passed.
+		if ( empty( $relationship_ids ) ) {
+			return false;
+		}
+
+		// Redirect to the success.
+		//Helpers\admin_page_redirect( array( 'success' => 1, 'action' => 'export', 'count' => count( $relationship_ids ) ) );
 	}
 
 	/**
