@@ -79,18 +79,51 @@ function get_admin_menu_link() {
 		return false;
 	}
 
+	// Set my slug.
+	$slug   = trim( Core\MENU_SLUG );
+
 	// Build out the link if we don't have our function.
 	if ( ! function_exists( 'menu_page_url' ) ) {
 
 		// Set my args.
-		$args   = array( 'post_type' => 'product', 'page' => Core\MENU_SLUG );
+		$args   = array( 'post_type' => 'product', 'page' => $slug );
 
 		// Return the link with our args.
 		return add_query_arg( $args, admin_url( 'edit.php' ) );
 	}
 
 	// Return using the function.
-	return menu_page_url( Core\MENU_SLUG, false );
+	return menu_page_url( $slug, false );
+}
+
+/**
+ * Handle our redirect within the admin settings page.
+ *
+ * @param  array $args  The query args to include in the redirect.
+ *
+ * @return void
+ */
+function admin_page_redirect( $args = array(), $response = true ) {
+
+	// Don't redirect if we didn't pass any args.
+	if ( empty( $args ) ) {
+		return;
+	}
+
+	// Handle the setup.
+	$redirect_args  = wp_parse_args( $args, array( 'post_type' => 'product', 'page' => trim( Core\MENU_SLUG ) ) );
+
+	// Add the default args we need in the return.
+	if ( $response ) {
+		$redirect_args  = wp_parse_args( array( 'wc-product-subs-response' => 1 ), $redirect_args );
+	}
+
+	// Now set my redirect link.
+	$redirect_link  = add_query_arg( $redirect_args, admin_url( 'edit.php' ) );
+
+	// Do the redirect.
+	wp_safe_redirect( $redirect_link );
+	exit;
 }
 
 /**

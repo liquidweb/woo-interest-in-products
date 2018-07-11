@@ -8,6 +8,7 @@
 // Set our aliases.
 use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
+use LiquidWeb\WooSubscribeToProducts\Database as Database;
 use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
 
 // Exit if accessed directly
@@ -153,10 +154,97 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 
 		// Make a basic array of the actions we wanna include.
-		$setup  = array(); // array( 'do_something' => __( 'Do Something', 'woo-subscribe-to-products' ) );
+		$setup  = array( 'wc_product_subs_unsubscribe' => __( 'Unsubscribe', 'woo-subscribe-to-products' ) );
 
 		// Return it filtered.
 		return apply_filters( Core\HOOK_PREFIX . 'table_bulk_actions', $setup );
+	}
+
+	/**
+	 * Handle bulk actions.
+	 *
+	 * @see $this->prepare_items()
+	 */
+	protected function process_bulk_action() {
+
+		// Bail if we aren't on the page.
+		if ( empty( $this->current_action() ) || 'wc_product_subs_unsubscribe' !== $this->current_action() ) {
+			return;
+		}
+
+		// Make sure we have the page we want.
+		if ( empty( $_GET['page'] ) || Core\MENU_SLUG !== sanitize_text_field( $_GET['page'] ) ) {
+			return;
+		}
+
+		// Fail on a missing or bad nonce.
+		if ( empty( $_POST['wc_product_subs_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_subs_nonce_name'], 'wc_product_subs_nonce_action' ) ) {
+			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
+		}
+
+		// Check for the array of relationship IDs being passed.
+		if ( empty( $_POST['wc_product_subs_relationship_ids'] ) ) {
+			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'no_ids' ) );
+		}
+
+		// Set and sanitize my IDs.
+		$relationship_ids   = array_map( 'absint', $_POST['wc_product_subs_relationship_ids'] );
+
+		// Now loop and kill each one.
+		foreach ( $relationship_ids as $relationship_id ) {
+			Database\delete_by_relationship( $relationship_id );
+		}
+
+		// If we had customer IDs passed, filter and purge transients.
+		if ( ! empty( $_POST['wc_product_subs_customer_ids'] ) ) {
+			$this->purge_customer_transients( $_POST['wc_product_subs_customer_ids'] );
+		}
+
+		// If we had product IDs passed, filter and purge transients.
+		if ( ! empty( $_POST['wc_product_subs_product_ids'] ) ) {
+			$this->purge_product_transients( $_POST['wc_product_subs_product_ids'] );
+		}
+
+		// Redirect to the success.
+		Helpers\admin_page_redirect( array( 'success' => 1, 'action' => 'unsubscribed', 'count' => count( $relationship_ids ) ) );
+	}
+
+	/**
+	 * Delete the transients for customer IDs.
+	 *
+	 * @param  array $customer_ids  The array of customer IDs we have.
+	 *
+	 * @return void
+	 */
+	protected function purge_customer_transients( $customer_ids = array() ) {
+
+		// First sanitize, then filter.
+		$customer_ids   = array_map( 'absint', $customer_ids );
+		$customer_ids   = array_unique( $customer_ids );
+
+		// Now loop and purge.
+		foreach ( $customer_ids as $customer_id ) {
+			delete_transient( 'woo_customer_subscribed_products_' . absint( $customer_id ) );
+		}
+	}
+
+	/**
+	 * Delete the transients for product IDs.
+	 *
+	 * @param  array $product_ids  The array of product IDs we have.
+	 *
+	 * @return void
+	 */
+	protected function purge_product_transients( $product_ids = array() ) {
+
+		// First sanitize, then filter.
+		$product_ids    = array_map( 'absint', $product_ids );
+		$product_ids    = array_unique( $product_ids );
+
+		// Now loop and purge.
+		foreach ( $product_ids as $product_id ) {
+			delete_transient( 'woo_product_subscribed_customers_' . absint( $product_id ) );
+		}
 	}
 
 	/**
@@ -172,7 +260,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$id = absint( $item['id'] );
 
 		// Return my checkbox.
-		return '<input type="checkbox" name="wc_product_subscriptions_relationship_ids[]" class="wc-product-subscriptions-admin-checkbox" id="cb-' . $id . '" value="' . $id . '" /><label for="cb-' . $id . '" class="screen-reader-text">' . __( 'Select subscription', 'woo-subscribe-to-products' ) . '</label>';
+		return '<input type="checkbox" name="wc_product_subs_relationship_ids[]" class="wc-product-subscriptions-admin-checkbox" id="cb-' . $id . '" value="' . $id . '" /><label for="cb-' . $id . '" class="screen-reader-text">' . __( 'Select subscription', 'woo-subscribe-to-products' ) . '</label>';
 	}
 
 	/**
@@ -191,6 +279,9 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-name">';
 			$setup .= '<strong>' . esc_html( $item['showname'] ) . '</strong>';
 		$setup .= '</span>';
+
+		// Add a hidden field with the value.
+		$setup .= '<input type="hidden" name="wc_product_subs_customer_ids[]" value="' . absint( $item['customer_id'] ) . '">';
 
 		// Create my formatted date.
 		$setup  = apply_filters( Core\HOOK_PREFIX . 'column_visible_name', $setup, $item );
@@ -236,6 +327,9 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			$setup .= '<a title="' . __( 'Edit Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $edit ) . '">' . esc_html__( 'Edit Product', 'woo-subscribe-to-products' ) . '</a>';
 
 		$setup .= '</span>';
+
+		// Add a hidden field with the value.
+		$setup .= '<input type="hidden" name="wc_product_subs_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
 
 		// Return my formatted date.
 		return apply_filters( Core\HOOK_PREFIX . 'column_product_name', $setup, $item );
@@ -350,14 +444,6 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			default :
 				return apply_filters( Core\HOOK_PREFIX . 'table_column_default', '', $dataset, $column_name );
 		}
-	}
-
-	/**
-	 * Handle bulk actions.
-	 *
-	 * @see $this->prepare_items()
-	 */
-	protected function process_bulk_action() {
 	}
 
 	/**

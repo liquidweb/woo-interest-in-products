@@ -247,3 +247,24 @@ function delete_by_product( $product_id = 0 ) {
 	// Delete the transient tied to the user.
 	delete_transient( 'woo_product_subscribed_customers_' . absint( $product_id ) );
 }
+
+/**
+ * Delete a row based on the relationship ID.
+ *
+ * @param  integer $product_id  The product ID tied to the customers.
+ *
+ * @return void
+ */
+function delete_by_relationship( $relationship_id = 0 ) {
+
+	// Make sure we have a relationship ID.
+	if ( empty( $relationship_id ) ) {
+		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Call the global database.
+	global $wpdb;
+
+	// Run my delete function.
+	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'relationship_id' => absint( $relationship_id ) ) );
+}
