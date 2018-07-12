@@ -1,19 +1,4 @@
-.misc-include-products-subscribe {
-  /*
-  &::before {
-  	font: normal 20px/1 dashicons;
-  	color: #82878c;
-  	content: "\f481";
-  	speak: none;
-  	display: inline-block;
-  	margin-left: -1px;
-  	padding-right: 3px;
-  	vertical-align: top;
-  	position: relative;
-  	top: -1px;
-  	-webkit-font-smoothing: antialiased;
-  	-moz-osx-font-smoothing: grayscale;
-  }
-  */ }
+.wc-product-subs-table-filter {
+  display: inline-block; }
 
 /*# sourceMappingURL=woo-subscribe-to-products-admin.css.map */

@@ -135,6 +135,76 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 }
 
 /**
+ * Get an array of all the customer IDs subscribed to something.
+ *
+ * @param  string  $return  Return just the IDs or the whole user object.
+ * @param  boolean $flush   Whether to flush the cache first or not.
+ *
+ * @return array
+ */
+function get_all_customers( $flush = false ) {
+
+	// Set my transient key.
+	$ky = 'woo_product_subscribed_customers';
+
+	// If we don't want the cache'd version, delete the transient first.
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
+	}
+
+	// Check the transient.
+	if ( false === $customer_data = get_transient( $ky )  ) {
+
+		// Call the global database.
+		global $wpdb;
+
+		// Set up our query.
+		$setup  = $wpdb->prepare("
+			SELECT   customer_id
+			FROM     $wpdb->wc_product_subscriptions
+			ORDER BY '%s' ASC
+		", esc_attr( 'created' ) );
+
+		// Process the query.
+		$query  = $wpdb->get_col( $setup );
+
+		// If we came back empty, check for an error return.
+		if ( ! $query ) {
+
+			// Return the WP_Error item if we have it, otherwise a generic false.
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
+		}
+
+		// Make sure they're unique.
+		$customers  = array_unique( $query );
+
+		// Set my empty array.
+		$customer_data  = array();
+
+		// Now loop and set the data for each user.
+		foreach ( $customers as $customer_id ) {
+
+			// Get our initial user object.
+			$user   = get_userdata( absint( $customer_id ) );
+
+			// Get the customer data, the user object.
+			$customer_data[ $customer_id ] = (array) $user->data;
+
+		}
+
+		// Set our transient with our data.
+		set_transient( $ky, $customer_data, HOUR_IN_SECONDS );
+	}
+
+	// Return the array of data, filtering out the duplicates.
+	return $customer_data;
+}
+
+/**
  * Get the products that have subscribed by a customer.
  *
  * @param  integer $customer_id  The user ID to look up.
@@ -197,11 +267,11 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 }
 
 /**
- * Get the product and customer ID from a relationship.
+ * Get the product and customer data from a relationship.
  *
  * @param  integer $relationship_id  The relationship ID tied to the subscription.
  *
- * @return void
+ * @return array
  */
 function get_data_by_relationship( $relationship_id = 0 ) {
 
@@ -252,11 +322,15 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 		// Get our initial user object.
 		$user   = get_userdata( absint( $clean['customer_id'] ) );
 
+		// Add the two IDs for easy array picking.
+		$relationship['customer_id'] = absint( $clean['customer_id'] );
+		$relationship['product_id']  = absint( $clean['product_id'] );
+
 		// Get the customer data, the user object.
-		$relationship['customer']   = (array) $user->data;
+		$relationship['customer']    = (array) $user->data;
 
 		// Get the product data, the WP_Post object.
-		$relationship['product']    = (array) get_post( absint( $clean['product_id'] ) );
+		$relationship['product']     = (array) get_post( absint( $clean['product_id'] ) );
 
 		// And add the signup date.
 		$relationship['signup']     = esc_attr( $clean['created'] );
@@ -267,4 +341,50 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 
 	// Return the relationship data.
 	return $relationship;
+}
+
+/**
+ * Just get everything for all the things.
+ *
+ * @return array
+ */
+function get_all_subscription_data() {
+
+	// Call the global database.
+	global $wpdb;
+
+	// Set up our query.
+	$setup  = $wpdb->prepare("
+		SELECT   relationship_id
+		FROM     $wpdb->wc_product_subscriptions
+		ORDER BY '%s' ASC
+	", esc_attr( 'created' ) );
+
+	// Process the query.
+	$query  = $wpdb->get_col( $setup );
+
+	// If we came back false, return the error.
+	if ( ! $query ) {
+
+		// Return the WP_Error item if we have it, otherwise a generic false.
+		if ( $wpdb->last_error ) {
+			return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+		} else {
+			return false;
+		}
+	}
+
+	// Make sure all the relationship IDs are valid.
+	$relationship_ids   = array_map( 'absint', $query );
+
+	// Set our blank.
+	$relationships = array();
+
+	// Now loop and fetch all the data.
+	foreach ( $relationship_ids as $id ) {
+		$relationships[ $id ] = get_data_by_relationship( $id );
+	}
+
+	// Return the relationship data.
+	return $relationships;
 }

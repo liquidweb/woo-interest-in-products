@@ -16,7 +16,35 @@ use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
 /**
  * Start our engines.
  */
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\load_settings_assets' );
 add_action( 'admin_menu', __NAMESPACE__ . '\load_settings_menu', 99 );
+
+/**
+ * Load our admin side JS and CSS.
+ *
+ * @param $hook  Admin page hook we are current on.
+ *
+ * @return void
+ */
+function load_settings_assets( $hook ) {
+
+	// Confirm we are on the settings page.
+	if ( ! Helpers\maybe_admin_settings_page( $hook ) ) {
+		return;
+	}
+
+	// Set my handle.
+	$handle = 'woo-subscribe-to-products-admin';
+
+	// Set a file suffix structure based on whether or not we want a minified version.
+	$file   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? $handle : $handle . '.min';
+
+	// Set a version for whether or not we're debugging.
+	$vers   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : Core\VERS;
+
+	// Load our CSS file.
+	wp_enqueue_style( $handle, Core\ASSETS_URL . '/css/' . $file . '.css', false, $vers, 'all' );
+}
 
 /**
  * Load our menu item.

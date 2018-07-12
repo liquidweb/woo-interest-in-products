@@ -51,20 +51,23 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Roll out each part.
 		$columns    = $this->get_columns();
-		$hidden     = array();
+		$hidden     = $this->get_hidden_columns();
 		$sortable   = $this->get_sortable_columns();
 		$dataset    = $this->table_data();
 
 		// Handle our sorting.
 		usort( $dataset, array( $this, 'sort_data' ) );
 
+		// Load up the pagination settings.
 		$paginate   = 10;
+		$item_count = count( $dataset );
 		$current    = $this->get_pagenum();
 
 		// Set my pagination args.
 		$this->set_pagination_args( array(
-			'total_items' => count( $dataset ),
-			'per_page'    => $paginate
+			'total_items' => $item_count,
+			'per_page'    => $paginate,
+			'total_pages' => ceil( $item_count / $paginate ),
 		));
 
 		// Slice up our dataset.
@@ -96,6 +99,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			'visible_name'  => __( 'Customer Name', 'woo-subscribe-to-products' ),
 			'product_name'  => __( 'Product Name', 'woo-subscribe-to-products' ),
 			'signup_date'   => __( 'Signup Date', 'woo-subscribe-to-products' ),
+			'action_list'   => __( 'Actions', 'woo-subscribe-to-products' ),
 		);
 
 		// Return filtered.
@@ -117,6 +121,143 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Add extra markup in the toolbars before or after the list.
+	 *
+	 * @param string $which  Which markup area after (bottom) or before (top) the list.
+	 */
+	protected function extra_tablenav( $which ) {
+
+		// Bail if we aren't on the top.
+		if ( 'top' !== $which ) {
+			return;
+		}
+
+		// Begin the markup.
+		echo '<div class="alignleft actions">';
+
+			// The product dropdown.
+			$this->product_filter_dropdown();
+
+			// The customer dropdown.
+			$this->customer_filter_dropdown();
+
+			// And handle our button.
+			echo '<button class="button action" name="wc-product-subs-filter-submit" type="submit" value="1">' . esc_html__( 'Filter', 'woo-subscribe-to-products' ) . '</button>';
+
+		// Close the div.
+		echo '</div>';
+	}
+
+	/**
+	 * Build and display the dropdown for products.
+	 *
+	 * @param  boolean $echo  Whether to echo out the markup or return.
+	 *
+	 * @return HTML
+	 */
+	protected function product_filter_dropdown( $echo = true ) {
+
+		// Get our enabled products.
+		$enabled_products   = Queries\get_enabled_products();
+
+		// Bail if we don't have any products to filter by.
+		if ( ! $enabled_products ) {
+			return;
+		}
+
+		// Set an empty.
+		$build  = '';
+
+		// Wrap the product dropdown in a div.
+		$build .= '<div class="wc-product-subs-table-filter wc-product-subs-table-filter-products">';
+
+			// Handle our screen reader label.
+			$build .= '<label class="screen-reader-text" for="wc-product-subs-product-filter">' . esc_html__( 'Filter by product', 'woo-subscribe-to-products' ) . '</label>';
+
+			// Begin the select dropdown.
+			$build .= '<select name="wc-product-subs-product-filter" id="wc-product-subs-product-filter" class="postform">';
+
+				// Load our null value.
+				$build .= '<option value="-1">' . esc_html__( 'All Products', 'woo-subscribe-to-products' ) . '</option>';
+
+				// Now loop my product IDs and show them.
+				foreach ( $enabled_products as $product_id ) {
+
+					// Set our title.
+					$pname  = get_the_title( $product_id );
+
+					// And load the dropdown.
+					$build .= '<option value="' . absint( $product_id ) . '">' . esc_html( $pname ) . '</option>';
+				}
+
+			// Close the select.
+			$build .= '</select>';
+
+		// Close the div.
+		$build .= '</div>';
+
+		// And return the build.
+		if ( ! $echo ) {
+			return $build;
+		}
+
+		// Echo out the build.
+		echo $build;
+	}
+
+	/**
+	 * Build and display the dropdown for customers.
+	 *
+	 * @param  boolean $echo  Whether to echo out the markup or return.
+	 *
+	 * @return HTML
+	 */
+	protected function customer_filter_dropdown( $echo = true ) {
+
+		// Get our current customers.
+		$current_customers  = Queries\get_all_customers();
+
+		// Bail if we don't have any current customers to filter by.
+		if ( ! $current_customers ) {
+			return;
+		}
+
+		// Set an empty.
+		$build  = '';
+
+		// Wrap the product dropdown in a div.
+		$build .= '<div class="wc-product-subs-table-filter wc-product-subs-table-filter-customers">';
+
+			// Handle our screen reader label.
+			$build .= '<label class="screen-reader-text" for="wc-product-subs-customer-filter">' . esc_html__( 'Filter by customer', 'woo-subscribe-to-products' ) . '</label>';
+
+			// Begin the select dropdown.
+			$build .= '<select name="wc-product-subs-customer-filter" id="wc-product-subs-customer-filter" class="postform">';
+
+				// Load our null value.
+				$build .= '<option value="-1">' . esc_html__( 'All Customers', 'woo-subscribe-to-products' ) . '</option>';
+
+				// Now loop my customers and show them.
+				foreach ( $current_customers as $customer_id => $customer_data ) {
+					$build .= '<option value="' . absint( $customer_id ) . '">' . esc_html( $customer_data['display_name'] ) . '</option>';
+				}
+
+			// Close the select.
+			$build .= '</select>';
+
+		// Close the div.
+		$build .= '</div>';
+
+		// And return the build.
+		if ( ! $echo ) {
+			return $build;
+		}
+
+		// Echo out the build.
+		echo $build;
+	}
+
+	/**
 	 * Return null for our table, since no row actions exist.
 	 *
 	 * @param  object $item         The item being acted upon.
@@ -132,7 +273,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	/**
 	 * Define the sortable columns.
 	 *
-	 * @return Array
+	 * @return array
 	 */
 	public function get_sortable_columns() {
 
@@ -145,6 +286,15 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Return it, filtered.
 		return apply_filters( Core\HOOK_PREFIX . 'table_sortable_columns', $setup );
+	}
+
+	/**
+	 * Define which columns are hidden.
+	 *
+	 * @return array
+	 */
+	public function get_hidden_columns() {
+		return apply_filters( Core\HOOK_PREFIX . 'table_hidden_columns', array() );
 	}
 
 	/**
@@ -265,7 +415,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		// Set the nonce for the export.
 		$nonce  = wp_create_nonce( 'wc_product_subs_export' );
 
-		// Redirect to the success.
+		// Redirect to trigger the export function.
 		Helpers\admin_page_redirect( array( 'wc_product_subs_export' => 1, 'nonce' => esc_attr( $nonce ) ), false );
 	}
 
@@ -337,7 +487,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Set the display name.
 		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-name">';
-			$setup .= '<strong>' . esc_html( $item['showname'] ) . '</strong>';
+			$setup .= '<strong>' . esc_html( $item['customer_name'] ) . '</strong>';
 		$setup .= '</span>';
 
 		// Add a hidden field with the value.
@@ -359,37 +509,30 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	 */
 	protected function column_product_name( $item ) {
 
-		// Get my product info.
-		$name   = get_the_title( $item['product_id'] );
-		$edit   = get_edit_post_link( $item['product_id'], 'raw' );
-		$view   = get_permalink( $item['product_id'] );
-
 		// Build my markup.
 		$setup  = '';
 
 		// Set the product name name.
 		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-product-name">';
-			$setup .= '<strong>' . esc_html( $name ) . '</strong>';
+			$setup .= '<strong>' . esc_html( $item['product_name'] ) . '</strong>';
 		$setup .= '</span>';
 
-		// Break it up.
-		$setup .= '<br>';
-
 		// Include the various product links.
-		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-product-links">';
+		$setup .= '<div class="row-actions wc-product-subscriptions-admin-table-actions">';
 
 			// Show the view link.
-			$setup .= '<a title="' . __( 'View Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $view ) . '">' . esc_html__( 'View Product', 'woo-subscribe-to-products' ) . '</a>';
+			$setup .= '<a title="' . __( 'View Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['product_link'] ) . '">' . esc_html__( 'View Product', 'woo-subscribe-to-products' ) . '</a>';
 
 			$setup .= '&nbsp;|&nbsp;';
 
 			// Show the edit link.
-			$setup .= '<a title="' . __( 'Edit Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $edit ) . '">' . esc_html__( 'Edit Product', 'woo-subscribe-to-products' ) . '</a>';
+			$setup .= '<a title="' . __( 'Edit Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['product_edit'] ) . '">' . esc_html__( 'Edit Product', 'woo-subscribe-to-products' ) . '</a>';
 
-		$setup .= '</span>';
+			// Add a hidden field with the value.
+			$setup .= '<input type="hidden" name="wc_product_subs_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
 
-		// Add a hidden field with the value.
-		$setup .= '<input type="hidden" name="wc_product_subs_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
+		// And close the div.
+		$setup .= '</div>';
 
 		// Return my formatted date.
 		return apply_filters( Core\HOOK_PREFIX . 'column_product_name', $setup, $item );
@@ -427,60 +570,63 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Our column with eventual actions we might have.
+	 *
+	 * @param  array  $item  The item from the data array.
+	 *
+	 * @return string
+	 */
+	protected function column_action_list( $item ) {
+
+		// This is clearly a placeholder.
+		return 'This is here until other things are.';
+	}
+
+	/**
 	 * Get the table data
 	 *
 	 * @return Array
 	 */
 	private function table_data() {
 
-		// Pull our list of enabled products.
-		$products   = Queries\get_enabled_products();
+		// Get all the relationship data.
+		$relationships  = Queries\get_all_subscription_data();
 
 		// Bail with no data.
-		if ( ! $products ) {
+		if ( ! $relationships ) {
 			return array();
 		}
 
 		// Set my empty.
 		$data   = array();
 
-		// Loop my enabled product data.
-		foreach ( $products as $product_id ) {
+		// Now loop each customer info.
+		foreach ( $relationships as $relationship_id => $relationship_data ) {
 
-			// Get my single subscription.
-			$customers  = Queries\get_customers_for_product( $product_id );
+			// Set my order args.
+			$order_args = array( 'post_type' => 'shop_order', 'post_status' => 'all', '_customer_user' => absint( $relationship_data['customer_id'] ) );
 
-			// Skip this product if no customers are subscribed.
-			if ( ! $customers ) {
-				continue;
-			}
+			// Set the array of the data we want.
+			$setup  = array(
+				'id'              => absint( $relationship_id ),
+				'product_id'      => absint( $relationship_data['product_id'] ),
+				'product_name'    => esc_attr( $relationship_data['product']['post_title'] ),
+				'product_edit'    => get_edit_post_link( absint( $relationship_data['product_id'] ), 'raw' ),
+				'product_link'    => get_permalink( absint( $relationship_data['product_id'] ) ),
+				'customer_id'     => absint( $relationship_data['customer_id'] ),
+				'customer_name'   => esc_attr( $relationship_data['customer']['display_name'] ),
+				'customer_edit'   => get_edit_user_link( absint( $relationship_data['product_id'] ), 'raw' ),
+				'customer_email'  => esc_attr( $relationship_data['customer']['user_email'] ),
+				'customer_orders' => add_query_arg( $order_args, admin_url( 'edit.php' ) ),
+				'signup_date'     => esc_attr( $relationship_data['signup'] ),
+			);
 
-			// Now loop each customer info.
-			foreach ( $customers as $customer_data ) {
-
-				// Fetch the individual userdata.
-				$user   = get_userdata( absint( $customer_data['customer_id'] ) );
-
-				// Set the array of the data we want.
-				$setup  = array(
-					'id'            => absint( $customer_data['relationship_id'] ),
-					'product_id'    => absint( $product_id ),
-					'customer_id'   => absint( $customer_data['customer_id'] ),
-					'username'      => $user->user_login,
-					'showname'      => $user->display_name,
-					'email_address' => $user->user_email,
-					'signup_date'   => $customer_data['created'],
-				);
-
-				// Run it through a filter.
-				$data[] = apply_filters( Core\HOOK_PREFIX . 'table_data_item', $setup );
-			}
-
-			// That's the end of our individual loops.
+			// Run it through a filter.
+			$data[] = apply_filters( Core\HOOK_PREFIX . 'table_data_item', $setup, $relationship_id, $relationship_data );
 		}
 
 		// Return our data.
-		return apply_filters( Core\HOOK_PREFIX . 'table_data_array', $data, $products );
+		return apply_filters( Core\HOOK_PREFIX . 'table_data_array', $data, $relationships );
 	}
 
 	/**
@@ -499,6 +645,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			case 'display_name' :
 			case 'product_name' :
 			case 'signup_date' :
+			case 'action_list' :
 				return ! empty( $dataset[ $column_name ] ) ? $dataset[ $column_name ] : '';
 
 			default :
@@ -512,6 +659,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	 * @return void
 	 */
 	protected function process_single_action() {
+		// There will likely be something here.
 	}
 
 	/**
@@ -523,19 +671,14 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	 */
 	private function setup_row_action_items( $item ) {
 
-		// Set my links.
-		$view   = get_edit_user_link( $item['customer_id'] );
-		$email  = 'mailto:' . antispambot( $item['email_address'] );
-		$orders = add_query_arg( array( 'post_type' => 'shop_order', 'post_status' => 'all', '_customer_user' => $item['customer_id'] ), admin_url( 'edit.php' ) );
-
 		// Set up our array of items.
 		$setup = array(
 
-			'view'   => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-view" title="' . __( 'View Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $view ) . '">' . esc_html( 'View Customer', 'woo-subscribe-to-products' ) . '</a>',
+			'view'   => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-view" title="' . __( 'View Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['customer_edit'] ) . '">' . esc_html( 'View Customer', 'woo-subscribe-to-products' ) . '</a>',
 
-			'orders' => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-orders" title="' . __( 'View Orders', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $orders ) . '">' . esc_html( 'View Orders', 'woo-subscribe-to-products' ) . '</a>',
+			'orders' => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-orders" title="' . __( 'View Orders', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['customer_orders'] ) . '">' . esc_html( 'View Orders', 'woo-subscribe-to-products' ) . '</a>',
 
-			'email'  => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-email" title="' . __( 'Email Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $email ) . '">' . esc_html( 'Email Customer', 'woo-subscribe-to-products' ) . '</a>',
+			'email'  => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-email" title="' . __( 'Email Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( 'mailto:' . antispambot( $item['customer_email'] ) ) . '">' . esc_html( 'Email Customer', 'woo-subscribe-to-products' ) . '</a>',
 		);
 
 		// Return our row actions.

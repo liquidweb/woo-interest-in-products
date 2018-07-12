@@ -127,6 +127,24 @@ function admin_page_redirect( $args = array(), $response = true ) {
 }
 
 /**
+ * Check if we are on the admin settings tab.
+ *
+ * @param  string $hook  Optional hook sent from some actions.
+ *
+ * @return boolean
+ */
+function maybe_admin_settings_page( $hook = '' ) {
+
+	// Can't be the admin page if we aren't admin, or don't have a hook.
+	if ( ! is_admin() || empty( $hook ) ) {
+		return false;
+	}
+
+	// Check the hook if we passed one.
+	return 'product_page_single-product-subs' === sanitize_text_field( $hook ) ? true : false;
+}
+
+/**
  * Set up a recursive callback for multi-dimensional text arrays.
  *
  * @param  array   $input   The data array.
