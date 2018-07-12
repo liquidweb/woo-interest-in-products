@@ -195,3 +195,76 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 	// Return the array of product IDs, filtering out the duplicates.
 	return $products;
 }
+
+/**
+ * Get the product and customer ID from a relationship.
+ *
+ * @param  integer $relationship_id  The relationship ID tied to the subscription.
+ *
+ * @return void
+ */
+function get_data_by_relationship( $relationship_id = 0 ) {
+
+	// Make sure we have a relationship ID.
+	if ( empty( $relationship_id ) ) {
+		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-subscribe-to-products' ) );
+	}
+
+	// Set my transient key.
+	$ky = 'woo_customer_relationship_data_' . absint( $relationship_id );
+
+	// If we don't want the cache'd version, delete the transient first.
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
+	}
+
+	// Check the transient.
+	if ( false === $relationship = get_transient( $ky )  ) {
+
+		// Call the global database.
+		global $wpdb;
+
+		// Set up our query.
+		$setup  = $wpdb->prepare("
+			SELECT   *
+			FROM     $wpdb->wc_product_subscriptions
+			WHERE    relationship_id = '%d'
+			ORDER BY created ASC
+		", absint( $relationship_id ) );
+
+		// Process the query.
+		$query  = $wpdb->get_row( $setup, ARRAY_A );
+
+		// If we came back false, return the error.
+		if ( ! $query ) {
+
+			// Return the WP_Error item if we have it, otherwise a generic false.
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
+		}
+
+		// Make sure they're unique and clean.
+		$clean  = Helpers\sanitize_text_recursive( $query );
+
+		// Get our initial user object.
+		$user   = get_userdata( absint( $clean['customer_id'] ) );
+
+		// Get the customer data, the user object.
+		$relationship['customer']   = (array) $user->data;
+
+		// Get the product data, the WP_Post object.
+		$relationship['product']    = (array) get_post( absint( $clean['product_id'] ) );
+
+		// And add the signup date.
+		$relationship['signup']     = esc_attr( $clean['created'] );
+
+		// Set our transient with our data.
+		set_transient( $ky, $relationship, HOUR_IN_SECONDS );
+	}
+
+	// Return the relationship data.
+	return $relationship;
+}

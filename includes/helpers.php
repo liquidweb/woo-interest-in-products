@@ -158,3 +158,43 @@ function sanitize_text_recursive( $input, $filter = false ) {
 	// Return the entire set.
 	return $output;
 }
+
+/**
+ * Run our individual strings through some clean up.
+ *
+ * @param  string $string  The data we wanna clean up.
+ *
+ * @return string
+ */
+function clean_export( $string ) {
+
+	// Original PHP code by Chirp Internet: www.chirp.com.au
+	// Please acknowledge use of this code by including this header.
+
+	// Handle my different string checks.
+	switch ( $string ) {
+
+		case 't':
+			$string = 'TRUE';
+			break;
+
+		case 'f':
+			$string = 'FALSE';
+			break;
+
+		case preg_match( "/^0/", $string ):
+		case preg_match( "/^\+?\d{8,}$/", $string ):
+		case preg_match( "/^\d{4}.\d{1,2}.\d{1,2}/", $string ):
+			$string = "'$string";
+			break;
+
+		case strstr( $string, '"' ):
+			$string = '"' . str_replace( '"', '""', $string ) . '"';
+			break;
+
+		default:
+			$string = mb_convert_encoding( $string, 'UTF-16LE', 'UTF-8' );
+
+		// End all case breaks.
+	}
+}

@@ -10,6 +10,7 @@ use LiquidWeb\WooSubscribeToProducts as Core;
 use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 use LiquidWeb\WooSubscribeToProducts\Database as Database;
 use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
+use LiquidWeb\WooSubscribeToProducts\DataExport as Export;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -258,8 +259,14 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			return false;
 		}
 
+		// Add our option key to get later.
+		update_option( 'wc_product_subs_export_ids', $relationship_ids, 'no' );
+
+		// Set the nonce for the export.
+		$nonce  = wp_create_nonce( 'wc_product_subs_export' );
+
 		// Redirect to the success.
-		//Helpers\admin_page_redirect( array( 'success' => 1, 'action' => 'export', 'count' => count( $relationship_ids ) ) );
+		Helpers\admin_page_redirect( array( 'wc_product_subs_export' => 1, 'nonce' => esc_attr( $nonce ) ), false );
 	}
 
 	/**
