@@ -55,6 +55,11 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$sortable   = $this->get_sortable_columns();
 		$dataset    = $this->table_data();
 
+		// Check for the _POST value to filter.
+		if ( ! empty( $_POST['wc-product-subs-filter-submit' ] ) ) {
+			$dataset    = $this->maybe_filter_dataset( $dataset );
+		}
+
 		// Handle our sorting.
 		usort( $dataset, array( $this, 'sort_data' ) );
 
@@ -178,7 +183,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			$build .= '<select name="wc-product-subs-product-filter" id="wc-product-subs-product-filter" class="postform">';
 
 				// Load our null value.
-				$build .= '<option value="-1">' . esc_html__( 'All Products', 'woo-subscribe-to-products' ) . '</option>';
+				$build .= '<option value="0">' . esc_html__( 'All Products', 'woo-subscribe-to-products' ) . '</option>';
 
 				// Now loop my product IDs and show them.
 				foreach ( $enabled_products as $product_id ) {
@@ -235,7 +240,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			$build .= '<select name="wc-product-subs-customer-filter" id="wc-product-subs-customer-filter" class="postform">';
 
 				// Load our null value.
-				$build .= '<option value="-1">' . esc_html__( 'All Customers', 'woo-subscribe-to-products' ) . '</option>';
+				$build .= '<option value="0">' . esc_html__( 'All Customers', 'woo-subscribe-to-products' ) . '</option>';
 
 				// Now loop my customers and show them.
 				foreach ( $current_customers as $customer_id => $customer_data ) {
@@ -627,6 +632,73 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Return our data.
 		return apply_filters( Core\HOOK_PREFIX . 'table_data_array', $data, $relationships );
+	}
+
+	/**
+	 * Take the default dataset and filter it.
+	 *
+	 * @param  array  $dataset  The current dataset we have.
+	 *
+	 * @return array
+	 */
+	protected function maybe_filter_dataset( $dataset = array() ) {
+
+		// Return the dataset we got if we don't have the submit.
+		if ( empty( $_POST['wc-product-subs-filter-submit' ] ) ) {
+			return $dataset;
+		}
+
+		// Make sure we have the page we want.
+		if ( empty( $_GET['page'] ) || Core\MENU_SLUG !== sanitize_text_field( $_GET['page'] ) ) {
+			return $dataset;
+		}
+
+		// Fail on a missing or bad nonce.
+		if ( empty( $_POST['wc_product_subs_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_subs_nonce_name'], 'wc_product_subs_nonce_action' ) ) {
+			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
+		}
+
+		// Handle a product ID filter.
+		if ( ! empty( $_POST['wc-product-subs-product-filter'] ) && 'product' === get_post_type( absint( $_POST['wc-product-subs-product-filter'] ) ) ) {
+			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-subs-product-filter'] ), 'product_id' );
+		}
+
+		// Handle a customer ID filter.
+		if ( ! empty( $_POST['wc-product-subs-customer-filter'] ) ) {
+			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-subs-customer-filter'] ), 'customer_id' );
+		}
+
+		// And return the dataset, however we have it.
+		return $dataset;
+	}
+
+	/**
+	 * Filter out the dataset by ID.
+	 *
+	 * @param  array   $dataset  The dataset we wanna filter.
+	 * @param  integer $id       The specific ID we wanna check for.
+	 * @param  string  $type     Which ID type. Either 'product_id', 'customer_id', or 'id'.
+	 *
+	 * @return array
+	 */
+	private function filter_dataset_by_id( $dataset = array(), $id = 0, $type = '' ) {
+
+		// Bail without a dataset, ID, or type.
+		if ( empty( $dataset ) || empty( $id ) || empty( $type ) ) {
+			return;
+		}
+
+		// Loop the dataset.
+		foreach ( $dataset as $index => $values ) {
+
+			// If we do not have a match, unset it and go about our day.
+			if ( absint( $id ) !== absint( $values[ $type ] ) ) {
+				unset( $dataset[ $index ] );
+			}
+		}
+
+		// Return thge dataset, with the array keys reset.
+		return ! empty( $dataset ) ? array_values( $dataset ) : array();
 	}
 
 	/**
