@@ -1,10 +1,10 @@
 {
-  "name": "woo-subscribe-to-products",
+  "name": "woo-interest-in-products",
   "version": "0.0.1",
   "description": "Allow customers to opt-in to notices about individual products.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/liquidweb/woo-subscribe-to-products.git"
+    "url": "https://github.com/liquidweb/woo-interest-in-products.git"
   },
   "author": {
     "name": "Liquid Web",

@@ -1,21 +1,21 @@
 <?php
 /**
- * Plugin Name: WooCommerce Subscribe To Products
- * Plugin URI:  https://github.com/liquidweb/woo-subscribe-to-products
+ * Plugin Name: WooCommerce Interest In Products
+ * Plugin URI:  https://github.com/liquidweb/woo-interest-in-products
  * Description: Allow customers to opt-in to notices about individual products.
  * Version:     0.0.1
  * Author:      Liquid Web
  * Author URI:  https://www.liquidweb.com
- * Text Domain: woo-subscribe-to-products
+ * Text Domain: woo-interest-in-products
  * Domain Path: /languages
  * License:     MIT
  * License URI: https://opensource.org/licenses/MIT
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts;
+namespace LiquidWeb\WooInterestInProducts;
 
 // Call our CLI namespace.
 use WP_CLI;
@@ -42,19 +42,19 @@ define( __NAMESPACE__ . '\URL', plugin_dir_url( __FILE__ ) );
 define( __NAMESPACE__ . '\ASSETS_URL', URL . 'assets' );
 
 // Set our tab base slug constant.
-define( __NAMESPACE__ . '\MENU_SLUG', 'single-product-subs' );
+define( __NAMESPACE__ . '\MENU_SLUG', 'product-interest-list' );
 
 // Set our custom table name.
-define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_subscriptions' );
+define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_interest' );
 
 // Set the prefix for our actions and filters.
-define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_subscribe_products_' );
+define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_products_interest_' );
 
 // Set the option key used to store the schema.
 define( __NAMESPACE__ . '\SCHEMA_KEY', HOOK_PREFIX . 'db_version' );
 
 // Set the meta key name for products.
-define( __NAMESPACE__ . '\PROD_META_KEY', '_product_subscribe_enabled' );
+define( __NAMESPACE__ . '\PROD_META_KEY', '_product_interest_enabled' );
 
 // Load the multi-use files.
 require_once __DIR__ . '/includes/helpers.php';
@@ -82,5 +82,5 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/includes/commands.php';
 
 	// And add our command.
-	WP_CLI::add_command( 'woo-subscribe-products', Commands::class );
+	WP_CLI::add_command( 'woo-product-interest', Commands::class );
 }

@@ -2,17 +2,17 @@
 /**
  * The individual post meta setup.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\PostMeta;
+namespace LiquidWeb\WooInterestInProducts\PostMeta;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
-use LiquidWeb\WooSubscribeToProducts\Layout as Layout;
-use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Layout as Layout;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
 
 /**
  * Start our engines.
@@ -36,7 +36,7 @@ function load_subscribed_customers_metabox( $post ) {
 	}
 
 	// Load the box.
-	add_meta_box( 'list-product-subs', __( 'Subscribed Customers', 'woo-subscribe-to-products' ), __NAMESPACE__ . '\display_subscribed_customers', 'product', 'side', 'default' );
+	add_meta_box( 'list-product-subs', __( 'Interested Customers', 'woo-interest-in-products' ), __NAMESPACE__ . '\display_interested_customers', 'product', 'side', 'default' );
 }
 
 /**
@@ -46,7 +46,7 @@ function load_subscribed_customers_metabox( $post ) {
  *
  * @return HTML
  */
-function display_subscribed_customers( $post ) {
+function display_interested_customers( $post ) {
 
 	// Grab the customers.
 	$customers  = Queries\get_customers_for_product( $post->ID );
@@ -55,7 +55,7 @@ function display_subscribed_customers( $post ) {
 	if ( ! $customers ) {
 
 		// Output the actual message.
-		echo '<p class="howto">' . esc_html__( 'No customers have subscribed to this product.', 'woo-subscribe-to-products' ) . '</p>';
+		echo '<p class="howto">' . esc_html__( 'No customers have signed up to this product.', 'woo-interest-in-products' ) . '</p>';
 
 		// And bail.
 		return;
@@ -84,8 +84,8 @@ function display_product_subscribe_checkbox() {
 			'id'            => 'include_product_subscribe',
 			'value'         => Helpers\maybe_product_enabled( $post->ID, true ),
 			'wrapper_class' => 'show_if_simple show_if_variable show_if_external hide_if_grouped',
-			'label'         => __( 'Include product signup', 'woo-subscribe-to-products' ),
-			'description'   => __( 'Displays a checkbox for this particular product at checkout.', 'woo-subscribe-to-products' ),
+			'label'         => __( 'Include product signup', 'woo-interest-in-products' ),
+			'description'   => __( 'Displays a checkbox for this particular product at checkout.', 'woo-interest-in-products' ),
 			'cbvalue'       => 'yes',
 		)
 	);
@@ -132,7 +132,7 @@ function save_product_subscribe( $post_id ) {
 	$prod->save();
 
 	// Delete the transient storing the enabled products.
-	delete_transient( 'woo_product_subscription_ids' );
+	delete_transient( 'woo_product_interest_ids' );
 
 	// @@todo add the product ID to some other option?
 }

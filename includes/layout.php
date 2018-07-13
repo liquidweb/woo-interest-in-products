@@ -2,14 +2,14 @@
 /**
  * Our layout functions to use across the plugin.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Layout;
+namespace LiquidWeb\WooInterestInProducts\Layout;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooInterestInProducts as Core;
 
 /**
  * Build out and return the checkboxes for the checkout.
@@ -27,7 +27,7 @@ function get_optin_checkout_field( $products = array(), $echo = false ) {
 	}
 
 	// Set my label.
-	$label  = apply_filters( Core\HOOK_PREFIX . 'checkout_label', __( 'Keep me informed about my products.', 'woo-subscribe-to-products' ), $products );
+	$label  = apply_filters( Core\HOOK_PREFIX . 'checkout_label', __( 'Keep me informed about my products.', 'woo-interest-in-products' ), $products );
 
 	// Set a string for my product IDs.
 	$ids    = implode( ',', $products );
@@ -36,13 +36,13 @@ function get_optin_checkout_field( $products = array(), $echo = false ) {
 	$build  = '';
 
 	// Wrap the field in a paragraph.
-	$build .= '<p class="form-row woo-subscribe-to-products-field">';
+	$build .= '<p class="form-row woo-interest-in-products-field">';
 
 		// Output some label.
-		$build .= '<label class="woocommerce-form__label woocommerce-form-woo-subscribe-to-products__label woocommerce-form__label-for-checkbox woo-subscribe-products-checkbox-label checkbox">';
+		$build .= '<label class="woocommerce-form__label woocommerce-form-woo-interest-in-products__label woocommerce-form__label-for-checkbox woo-interest-in-products-checkbox-label checkbox">';
 
 			// Handle our field output.
-			$build .= '<input class="woocommerce-form__input woocommerce-form-woo-subscribe-to-products__input-checkbox woocommerce-form__input-checkbox input-checkbox" name="woo-product-subscribe" id="" type="checkbox" value="' . esc_attr( $ids ) . '">';
+			$build .= '<input class="woocommerce-form__input woocommerce-form-woo-interest-in-products__input-checkbox woocommerce-form__input-checkbox input-checkbox" name="woo-product-interest" id="" type="checkbox" value="' . esc_attr( $ids ) . '">';
 
 			// Add the label text if present.
 			$build .= '<span>' . esc_html( $label ) . '</span>';
@@ -51,7 +51,7 @@ function get_optin_checkout_field( $products = array(), $echo = false ) {
 		$build .= '</label>';
 
 		// Add a nonce field because nonce fields.
-		$build .= wp_nonce_field( 'customer_prodsub_nonce_action', 'customer_prodsub_nonce_name', false, false );
+		$build .= wp_nonce_field( 'product_interest_nonce_action', 'product_interest_nonce_name', false, false );
 
 	// Close the single paragraph.
 	$build .= '</p>';
@@ -66,7 +66,7 @@ function get_optin_checkout_field( $products = array(), $echo = false ) {
 }
 
 /**
- * Build out and return the list of subscribed customers.
+ * Build out and return the list of signed up customers.
  *
  * @param  array   $customers  The array of customer IDs.
  * @param  boolean $echo       Whether to echo it out or return.
@@ -96,7 +96,7 @@ function get_subscribed_customers_list( $customers = array(), $echo = false ) {
 		// And the output.
 		$build .= '<li>';
 			$build .= '<a href="' . esc_url( $link ) . '">' . esc_html( $user->display_name ) . '</a>';
-			$build .= ' <strong>(' . esc_html__( 'ID:', 'woo-subscribe-to-products' ) . ' ' . absint( $customer_id ) . ')</strong>';
+			$build .= ' <strong>(' . esc_html__( 'ID:', 'woo-interest-in-products' ) . ' ' . absint( $customer_id ) . ')</strong>';
 		$build .= '</li>';
 	}
 

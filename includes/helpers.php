@@ -2,14 +2,14 @@
 /**
  * Our helper functions to use across the plugin.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Helpers;
+namespace LiquidWeb\WooInterestInProducts\Helpers;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooInterestInProducts as Core;
 
 /**
  * Check a product ID to see if it enabled.
@@ -115,7 +115,7 @@ function admin_page_redirect( $args = array(), $response = true ) {
 
 	// Add the default args we need in the return.
 	if ( $response ) {
-		$redirect_args  = wp_parse_args( array( 'wc-product-subs-response' => 1 ), $redirect_args );
+		$redirect_args  = wp_parse_args( array( 'wc-product-interest-response' => 1 ), $redirect_args );
 	}
 
 	// Now set my redirect link.
@@ -141,7 +141,7 @@ function maybe_admin_settings_page( $hook = '' ) {
 	}
 
 	// Check the hook if we passed one.
-	return 'product_page_single-product-subs' === sanitize_text_field( $hook ) ? true : false;
+	return 'product_page_product-interest-list' === sanitize_text_field( $hook ) ? true : false;
 }
 
 /**

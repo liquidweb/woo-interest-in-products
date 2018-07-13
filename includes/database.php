@@ -2,15 +2,15 @@
 /**
  * All functions related to the custom tables.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Database;
+namespace LiquidWeb\WooInterestInProducts\Database;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
 
 /**
  * Start our engines.
@@ -28,7 +28,7 @@ function register_table() {
 	global $wpdb;
 
 	// Set the messages.
-	$wpdb->wc_product_subscriptions = $wpdb->prefix . Core\TABLE_NAME;
+	$wpdb->wc_product_interest = $wpdb->prefix . Core\TABLE_NAME;
 }
 
 /**
@@ -42,7 +42,7 @@ function maybe_table_exists() {
 	global $wpdb;
 
 	// Set my table name.
-	$table  = $wpdb->wc_product_subscriptions;
+	$table  = $wpdb->wc_product_interest;
 
 	// Run the lookup.
 	$lookup = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) );
@@ -139,12 +139,12 @@ function insert( $customer_id = 0, $products = array() ) {
 
 	// Make sure we have a customer ID.
 	if ( empty( $customer_id ) ) {
-		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-interest-in-products' ) );
 	}
 
 	// Make sure we have products.
 	if ( empty( $products ) || ! is_array( $products ) ) {
-		return new WP_Error( 'missing_invalid_products', __( 'The required product IDs are missing or invalid.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_invalid_products', __( 'The required product IDs are missing or invalid.', 'woo-interest-in-products' ) );
 	}
 
 	// Run the action before doing anything.
@@ -161,7 +161,7 @@ function insert( $customer_id = 0, $products = array() ) {
 
 		// Make sure we have a product ID.
 		if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
-			return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
+			return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-interest-in-products' ) );
 		}
 
 		// Set my insert data.
@@ -177,11 +177,11 @@ function insert( $customer_id = 0, $products = array() ) {
 		$format = apply_filters( Core\HOOK_PREFIX . 'insert_data_format', array( '%d', '%d', '%s' ) );
 
 		// Run my insert function.
-		$wpdb->insert( $wpdb->wc_product_subscriptions, $insert, $format );
+		$wpdb->insert( $wpdb->wc_product_interest, $insert, $format );
 
 		// Check for the ID and throw an error if we don't have it.
 		if ( ! $wpdb->insert_id ) {
-			return new WP_Error( 'db_insert_error', __( 'There was an error adding this to the database.', 'woo-subscribe-to-products' ) );
+			return new WP_Error( 'db_insert_error', __( 'There was an error adding this to the database.', 'woo-interest-in-products' ) );
 		}
 
 		// Run our action after it has been inserted.
@@ -206,17 +206,17 @@ function delete_by_customer( $customer_id = 0 ) {
 
 	// Make sure we have a customer ID.
 	if ( empty( $customer_id ) ) {
-		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-interest-in-products' ) );
 	}
 
 	// Call the global database.
 	global $wpdb;
 
 	// Run my delete function.
-	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'customer_id' => absint( $customer_id ) ) );
+	$delete = $wpdb->delete( $wpdb->wc_product_interest, array( 'customer_id' => absint( $customer_id ) ) );
 
 	// Delete the transient tied to the user.
-	delete_transient( 'woo_customer_subscribed_products_' . absint( $customer_id ) );
+	delete_transient( 'woo_customer_interest_products_' . absint( $customer_id ) );
 }
 
 /**
@@ -230,22 +230,22 @@ function delete_by_product( $product_id = 0 ) {
 
 	// Make sure we have a product ID.
 	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
-		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-interest-in-products' ) );
 	}
 
 	// Make sure we have an enabled product.
 	if ( ! Helpers\maybe_product_enabled( $product_id ) ) {
-		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-interest-in-products' ) );
 	}
 
 	// Call the global database.
 	global $wpdb;
 
 	// Run my delete function.
-	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'product_id' => absint( $product_id ) ) );
+	$delete = $wpdb->delete( $wpdb->wc_product_interest, array( 'product_id' => absint( $product_id ) ) );
 
 	// Delete the transient tied to the user.
-	delete_transient( 'woo_product_subscribed_customers_' . absint( $product_id ) );
+	delete_transient( 'woo_product_interest_customers_' . absint( $product_id ) );
 }
 
 /**
@@ -259,12 +259,12 @@ function delete_by_relationship( $relationship_id = 0 ) {
 
 	// Make sure we have a relationship ID.
 	if ( empty( $relationship_id ) ) {
-		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-interest-in-products' ) );
 	}
 
 	// Call the global database.
 	global $wpdb;
 
 	// Run my delete function.
-	$delete = $wpdb->delete( $wpdb->wc_product_subscriptions, array( 'relationship_id' => absint( $relationship_id ) ) );
+	$delete = $wpdb->delete( $wpdb->wc_product_interest, array( 'relationship_id' => absint( $relationship_id ) ) );
 }

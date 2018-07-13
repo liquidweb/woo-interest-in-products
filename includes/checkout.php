@@ -2,33 +2,33 @@
 /**
  * Our functions related to the checkout.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Checkout;
+namespace LiquidWeb\WooInterestInProducts\Checkout;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
-use LiquidWeb\WooSubscribeToProducts\Layout as Layout;
-use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
-use LiquidWeb\WooSubscribeToProducts\Database as Database;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Layout as Layout;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
+use LiquidWeb\WooInterestInProducts\Database as Database;
 
 /**
  * Start our engines.
  */
-add_action( 'woocommerce_review_order_before_submit', __NAMESPACE__ . '\display_product_subscribe_fields' );
-add_filter( 'woocommerce_checkout_posted_data', __NAMESPACE__ . '\merge_product_subscribe_data' );
-add_action( 'woocommerce_after_checkout_validation', __NAMESPACE__ . '\validate_product_subscribe_data', 10, 2 );
-add_action( 'woocommerce_checkout_update_user_meta', __NAMESPACE__ . '\update_customer_product_subscriptions', 10, 2 );
+add_action( 'woocommerce_review_order_before_submit', __NAMESPACE__ . '\display_product_interest_fields' );
+add_filter( 'woocommerce_checkout_posted_data', __NAMESPACE__ . '\merge_product_interest_data' );
+add_action( 'woocommerce_after_checkout_validation', __NAMESPACE__ . '\validate_product_interest_data', 10, 2 );
+add_action( 'woocommerce_checkout_update_user_meta', __NAMESPACE__ . '\update_customer_product_interest', 10, 2 );
 
 /**
  * Add our new opt-in boxes to the checkout.
  *
  * @return HTML
  */
-function display_product_subscribe_fields() {
+function display_product_interest_fields() {
 
 	// Don't run any of this on a guest user.
 	if ( ! is_user_logged_in() ) {
@@ -67,7 +67,7 @@ function display_product_subscribe_fields() {
  *
  * @return array  $data  The possibly modified posted data.
  */
-function merge_product_subscribe_data( $data ) {
+function merge_product_interest_data( $data ) {
 
 	// Don't run any of this on a guest user.
 	if ( ! is_user_logged_in() ) {
@@ -75,23 +75,23 @@ function merge_product_subscribe_data( $data ) {
 	}
 
 	// Bail if we have no posted data.
-	if ( empty( $_POST['woo-product-subscribe'] ) ) { // WPCS: CSRF ok.
+	if ( empty( $_POST['woo-product-interest'] ) ) { // WPCS: CSRF ok.
 		return $data;
 	}
 
 	// Check to see if our nonce was provided.
-	if ( empty( $_POST['customer_prodsub_nonce_name'] ) || ! wp_verify_nonce( $_POST['customer_prodsub_nonce_name'], 'customer_prodsub_nonce_action' ) ) {
+	if ( empty( $_POST['product_interest_nonce_name'] ) || ! wp_verify_nonce( $_POST['product_interest_nonce_name'], 'product_interest_nonce_action' ) ) {
 		return $data;
 	}
 
 	// Explode the string of IDs into an array..
-	$array  = explode( ',', sanitize_text_field( $_POST['woo-product-subscribe'] ) );
+	$array  = explode( ',', sanitize_text_field( $_POST['woo-product-interest'] ) );
 
 	// Clean each entry.
 	$items  = array_map( 'absint', $array );
 
 	// Merge our opt-in items to the overall data array and return it.
-	return array_merge( $data, array( 'subscribed-products' => $items ) );
+	return array_merge( $data, array( 'product-interest' => $items ) );
 }
 
 /**
@@ -102,26 +102,26 @@ function merge_product_subscribe_data( $data ) {
  *
  * @return mixed
  */
-function validate_product_subscribe_data( $data, $errors ) {
+function validate_product_interest_data( $data, $errors ) {
 
 	// Don't run any of this on a guest user.
 	if ( ! is_user_logged_in() ) {
 		return;
 	}
 
-	// Bail if we have no subscriber data.
-	if ( empty( $data['subscribed-products'] ) ) {
+	// Bail if we have no signup data.
+	if ( empty( $data['product-interest'] ) ) {
 		return;
 	}
 
 	// Now loop my products and make sure they are actually products.
-	foreach ( $data['subscribed-products'] as $product_id ) {
+	foreach ( $data['product-interest'] as $product_id ) {
 
 		// First make sure it is a product.
 		if ( 'product' !== get_post_type( $product_id ) ) {
 
 			// Set our error message.
-			$error_text = sprintf( __( 'ID %d is not a valid product', 'woo-subscribe-to-products' ), absint( $product_id ) );
+			$error_text = sprintf( __( 'ID %d is not a valid product', 'woo-interest-in-products' ), absint( $product_id ) );
 
 			// And add my error.
 			$errors->add( 'invalid_product_id', $error_text );
@@ -134,7 +134,7 @@ function validate_product_subscribe_data( $data, $errors ) {
 		if ( ! $enable ) {
 
 			// Set our error message.
-			$error_text = sprintf( __( 'Signups have not been enabled for product ID %d', 'woo-subscribe-to-products' ), absint( $product_id ) );
+			$error_text = sprintf( __( 'Signups have not been enabled for product ID %d', 'woo-interest-in-products' ), absint( $product_id ) );
 
 			// And add my error.
 			$errors->add( 'product_not_enabled', $error_text );
@@ -153,7 +153,7 @@ function validate_product_subscribe_data( $data, $errors ) {
  *
  * @return void
  */
-function update_customer_product_subscriptions( $customer_id, $data ) {
+function update_customer_product_interest( $customer_id, $data ) {
 
 	// Don't run any of this on a guest user.
 	if ( ! is_user_logged_in() ) {
@@ -166,12 +166,12 @@ function update_customer_product_subscriptions( $customer_id, $data ) {
 	}
 
 	// If we don't have any products, just bail.
-	if ( empty( $data['subscribed-products'] ) ) {
+	if ( empty( $data['product-interest'] ) ) {
 		return;
 	}
 
 	// Set my products.
-	$items  = array_map( 'absint', $data['subscribed-products'] );
+	$items  = array_map( 'absint', $data['product-interest'] );
 
 	// Run the inserts.
 	$update = Database\insert( $customer_id, (array) $items );

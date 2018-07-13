@@ -2,15 +2,15 @@
 /**
  * Our activation call
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Activate;
+namespace LiquidWeb\WooInterestInProducts\Activate;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Database as Database;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Database as Database;
 
 /**
  * Our inital setup function when activated.

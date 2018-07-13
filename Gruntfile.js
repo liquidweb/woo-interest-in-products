@@ -10,7 +10,7 @@ module.exports = function( grunt ) {
     // Process the textdomain.
     addtextdomain: {
       options: {
-        textdomain: 'woo-subscribe-to-products',
+        textdomain: 'woo-interest-in-products',
       },
       update_all_domains: {
         options: {
@@ -34,8 +34,8 @@ module.exports = function( grunt ) {
         options: {
           domainPath: '/languages',
           exclude: [ '\.git/*', 'bin/*', 'node_modules/*', 'tests/*' ],
-          mainFile: 'woo-subscribe-to-products.php',
-          potFilename: 'woo-subscribe-to-products.pot',
+          mainFile: 'woo-interest-in-products.php',
+          potFilename: 'woo-interest-in-products.pot',
           potHeaders: {
             poedit: true,
             'x-poedit-keywordslist': true

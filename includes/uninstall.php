@@ -2,14 +2,14 @@
 /**
  * Our uninstall call
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Uninstall;
+namespace LiquidWeb\WooInterestInProducts\Uninstall;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooInterestInProducts as Core;
 
 /**
  * Delete various options when uninstalling the plugin.

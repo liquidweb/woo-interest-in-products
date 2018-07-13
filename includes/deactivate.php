@@ -2,14 +2,14 @@
 /**
  * Our deactivation call
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Deactivate;
+namespace LiquidWeb\WooInterestInProducts\Deactivate;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooInterestInProducts as Core;
 
 /**
  * Delete various options when deactivating the plugin.

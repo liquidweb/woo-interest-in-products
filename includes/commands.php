@@ -2,14 +2,14 @@
 /**
  * The functionality tied to the WP-CLI stuff.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Call our namepsace.
-namespace LiquidWeb\WooSubscribeToProducts;
+namespace LiquidWeb\WooInterestInProducts;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
+use LiquidWeb\WooInterestInProducts as Core;
 
 // Pull in the CLI items.
 use WP_CLI;
@@ -57,11 +57,11 @@ class Commands extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp woo-subscribe-products subscribe_all
+	 *     wp woo-product-interest enable_all_products
 	 *
 	 * @when after_wp_load
 	 */
-	function subscribe_all( $args = array(), $assoc_args = array() ) {
+	function enable_all_products( $args = array(), $assoc_args = array() ) {
 
 		// Parse out the associatives.
 		$parsed = wp_parse_args( $assoc_args, array(
@@ -73,14 +73,14 @@ class Commands extends WP_CLI_Command {
 
 		// Bail on empty or error.
 		if ( empty( $products ) || is_wp_error( $products ) ) {
-			WP_CLI::error( __( 'No product IDs could be retrieved.', 'woo-subscribe-to-products' ) );
+			WP_CLI::error( __( 'No product IDs could be retrieved.', 'woo-interest-in-products' ) );
 		}
 
 		// Set a counter.
 		$update = 0;
 
 		// Set up the progress bar.
-		$ticker = \WP_CLI\Utils\make_progress_bar( __( 'Updating products...', 'woo-subscribe-to-products' ), count( $products ) );
+		$ticker = \WP_CLI\Utils\make_progress_bar( __( 'Updating products...', 'woo-interest-in-products' ), count( $products ) );
 
 		// Now loop my product IDs and either set or delete the key.
 		foreach ( $products as $product_id ) {
@@ -102,7 +102,7 @@ class Commands extends WP_CLI_Command {
 		$ticker->finish();
 
 		// Show the result and bail.
-		WP_CLI::success( sprintf( _n( '%d product has been updated.', '%d products have been updated.', absint( $update ), 'woo-subscribe-to-products' ), absint( $update ) ) );
+		WP_CLI::success( sprintf( _n( '%d product has been updated.', '%d products have been updated.', absint( $update ), 'woo-interest-in-products' ), absint( $update ) ) );
 		WP_CLI::halt( 0 );
 	}
 
@@ -111,7 +111,7 @@ class Commands extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp woo-subscribe-products runtests
+	 *     wp woo-product-interest runtests
 	 *
 	 * @when after_wp_load
 	 */

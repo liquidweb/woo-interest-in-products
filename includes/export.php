@@ -2,16 +2,16 @@
 /**
  * The functionality tied to the actual export.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\DataExport;
+namespace LiquidWeb\WooInterestInProducts\DataExport;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
-use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
 
 add_action( 'admin_init', __NAMESPACE__ . '\export_subscription_data', 1 );
 
@@ -25,17 +25,17 @@ add_action( 'admin_init', __NAMESPACE__ . '\export_subscription_data', 1 );
 function export_subscription_data() {
 
 	// Bail if we don't have our flag.
-	if ( empty( $_GET['wc_product_subs_export'] ) ) {
+	if ( empty( $_GET['wc_product_interest_export'] ) ) {
 		return;
 	}
 
 	// Fail on a missing or bad nonce.
-	if ( empty( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'wc_product_subs_export' ) ) {
+	if ( empty( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'wc_product_interest_export' ) ) {
 		Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
 	}
 
 	// Fetch the dataset requested.
-	$stored = get_option( 'wc_product_subs_export_ids', false );
+	$stored = get_option( 'wc_product_interest_export_ids', false );
 
 	// Fail on missing data.
 	if ( ! $stored ) {
@@ -102,7 +102,7 @@ function get_export_filename() {
 	$sitename   = get_option( 'blogname' );
 
 	// Append the timestamp and export name.
-	$filename   = strtolower( $sitename ) . '-wc-product-subs-export-' . time() . '.csv';
+	$filename   = strtolower( $sitename ) . '-wc-product-interest-export-' . time() . '.csv';
 
 	// Return filtered and sanitized.
 	return apply_filters( Core\HOOK_PREFIX . 'export_filename', sanitize_file_name( $filename ) );
@@ -117,10 +117,10 @@ function get_export_headers() {
 
 	// Build our array of header titles.
 	$setup  = array(
-		__( 'Customer Name', 'woo-subscribe-to-products' ),
-		__( 'Customer Email', 'woo-subscribe-to-products' ),
-		__( 'Product Name', 'woo-subscribe-to-products' ),
-		__( 'Signup Date', 'woo-subscribe-to-products' ),
+		__( 'Customer Name', 'woo-interest-in-products' ),
+		__( 'Customer Email', 'woo-interest-in-products' ),
+		__( 'Product Name', 'woo-interest-in-products' ),
+		__( 'Signup Date', 'woo-interest-in-products' ),
 	);
 
 	// Return filtered.

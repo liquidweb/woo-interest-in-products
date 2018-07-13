@@ -2,16 +2,16 @@
 /**
  * The functionality tied to the settings tab.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\SettingsTab;
+namespace LiquidWeb\WooInterestInProducts\SettingsTab;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
-use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
 
 /**
  * Start our engines.
@@ -34,7 +34,7 @@ function load_settings_assets( $hook ) {
 	}
 
 	// Set my handle.
-	$handle = 'woo-subscribe-to-products-admin';
+	$handle = 'woo-interest-in-products-admin';
 
 	// Set a file suffix structure based on whether or not we want a minified version.
 	$file   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? $handle : $handle . '.min';
@@ -56,8 +56,8 @@ function load_settings_menu() {
 	// Add our submenu page.
 	add_submenu_page(
 		'edit.php?post_type=product',
-		__( 'Product Subscriptions', 'woo-subscribe-to-products' ),
-		__( 'Subscriptions', 'woo-subscribe-to-products' ),
+		__( 'Product Interest Signups', 'woo-interest-in-products' ),
+		__( 'Product Interest', 'woo-interest-in-products' ),
 		'manage_options',
 		Core\MENU_SLUG,
 		__NAMESPACE__ . '\settings_page_view'
@@ -72,26 +72,26 @@ function load_settings_menu() {
 function settings_page_view() {
 
 	// Wrap the entire thing.
-	echo '<div class="wrap wc-product-subscriptions-admin-wrap">';
+	echo '<div class="wrap wc-product-interest-admin-wrap">';
 
 		// Handle the title.
-		echo '<h1 class="wc-product-subscriptions-admin-title">' . get_admin_page_title() . '</h1>';
+		echo '<h1 class="wc-product-interest-admin-title">' . get_admin_page_title() . '</h1>';
 
 		// Handle the table.
-		echo subscription_list_table();
+		echo interest_list_table();
 
 	// Close the entire thing.
 	echo '</div>';
 }
 
 /**
- * Create and return the table of subscription data.
+ * Create and return the table of interest signup data.
  *
- * @param  array  $requests  The existing requests.
+ * @param  array $requests  The existing requests.
  *
  * @return HTML
  */
-function subscription_list_table() {
+function interest_list_table() {
 
 	// Pull our list of enabled products.
 	$products   = Queries\get_enabled_products();
@@ -100,7 +100,7 @@ function subscription_list_table() {
 	if ( empty( $products ) ) {
 
 		// Echo out the message.
-		echo '<p>' . esc_html__( 'There are no enabled product subscriptions.', 'woo-subscribe-to-products' ) . '</p>';
+		echo '<p>' . esc_html__( 'There are no enabled products.', 'woo-interest-in-products' ) . '</p>';
 
 		// And be done.
 		return;
@@ -110,13 +110,13 @@ function subscription_list_table() {
 	$action = Helpers\get_admin_menu_link();
 
 	// Call our table class.
-	$table  = new \SingleProductSubscriptions_Table();
+	$table  = new \ProductInterestSignups_Table();
 
 	// And output the table.
 	$table->prepare_items();
 
 	// And handle the display
-	echo '<form class="wc-product-subscriptions-admin-form" id="wc-product-subscriptions-products-admin-form" action="' . esc_url( $action ) . '" method="post">';
+	echo '<form class="wc-product-interest-admin-form" id="wc-product-interest-admin-form" action="' . esc_url( $action ) . '" method="post">';
 
 	// The actual table itself.
 	$table->display();

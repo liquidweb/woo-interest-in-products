@@ -2,15 +2,15 @@
 /**
  * Basic data queries used within the plugin.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Declare our namespace.
-namespace LiquidWeb\WooSubscribeToProducts\Queries;
+namespace LiquidWeb\WooInterestInProducts\Queries;
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
 
 /**
  * Get all the product IDs that have the signup enabled.
@@ -22,7 +22,7 @@ use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
 function get_enabled_products( $flush = false ) {
 
 	// Set my transient key.
-	$ky = 'woo_product_subscription_ids';
+	$ky = 'woo_product_interest_ids';
 
 	// If we don't want the cache'd version, delete the transient first.
 	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -50,7 +50,7 @@ function get_enabled_products( $flush = false ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
 			if ( $wpdb->last_error ) {
-				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
 			} else {
 				return false;
 			}
@@ -68,73 +68,6 @@ function get_enabled_products( $flush = false ) {
 }
 
 /**
- * Get the customers that have subscribed to a single product.
- *
- * @param  integer $product_id  The product ID to look up.
- * @param  boolean $flush       Whether to flush the cache first or not.
- *
- * @return array
- */
-function get_customers_for_product( $product_id = 0, $flush = false ) {
-
-	// Make sure we have a product ID.
-	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
-		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-subscribe-to-products' ) );
-	}
-
-	// Make sure we have an enabled product.
-	if ( ! Helpers\maybe_product_enabled( $product_id ) ) {
-		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-subscribe-to-products' ) );
-	}
-
-	// Set my transient key.
-	$ky = 'woo_product_subscribed_customers_' . absint( $product_id );
-
-	// If we don't want the cache'd version, delete the transient first.
-	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		delete_transient( $ky );
-	}
-
-	// Check the transient.
-	if ( false === $customers = get_transient( $ky )  ) {
-
-		// Call the global database.
-		global $wpdb;
-
-		// Set up our query.
-		$setup  = $wpdb->prepare("
-			SELECT   *
-			FROM     $wpdb->wc_product_subscriptions
-			WHERE    product_id = '%d'
-			ORDER BY created ASC
-		", absint( $product_id ) );
-
-		// Process the query.
-		$query  = $wpdb->get_results( $setup, ARRAY_A );
-
-		// If we came back empty, check for an error return.
-		if ( ! $query ) {
-
-			// Return the WP_Error item if we have it, otherwise a generic false.
-			if ( $wpdb->last_error ) {
-				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
-			} else {
-				return false;
-			}
-		}
-
-		// Make sure they're unique.
-		$customers  = Helpers\sanitize_text_recursive( $query );
-
-		// Set our transient with our data.
-		set_transient( $ky, $customers, HOUR_IN_SECONDS );
-	}
-
-	// Return the array of user IDs, filtering out the duplicates.
-	return $customers;
-}
-
-/**
  * Get an array of all the customer IDs subscribed to something.
  *
  * @param  string  $return  Return just the IDs or the whole user object.
@@ -145,7 +78,7 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 function get_all_customers( $flush = false ) {
 
 	// Set my transient key.
-	$ky = 'woo_product_subscribed_customers';
+	$ky = 'woo_product_interest_customers_all';
 
 	// If we don't want the cache'd version, delete the transient first.
 	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -158,10 +91,13 @@ function get_all_customers( $flush = false ) {
 		// Call the global database.
 		global $wpdb;
 
+		// Set our various table names.
+		$table  = $wpdb->prefix . Core\TABLE_NAME;
+
 		// Set up our query.
 		$setup  = $wpdb->prepare("
 			SELECT   customer_id
-			FROM     $wpdb->wc_product_subscriptions
+			FROM     $table
 			ORDER BY '%s' ASC
 		", esc_attr( 'created' ) );
 
@@ -173,7 +109,7 @@ function get_all_customers( $flush = false ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
 			if ( $wpdb->last_error ) {
-				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
 			} else {
 				return false;
 			}
@@ -193,7 +129,6 @@ function get_all_customers( $flush = false ) {
 
 			// Get the customer data, the user object.
 			$customer_data[ $customer_id ] = (array) $user->data;
-
 		}
 
 		// Set our transient with our data.
@@ -202,6 +137,76 @@ function get_all_customers( $flush = false ) {
 
 	// Return the array of data, filtering out the duplicates.
 	return $customer_data;
+}
+
+/**
+ * Get the customers that have subscribed to a single product.
+ *
+ * @param  integer $product_id  The product ID to look up.
+ * @param  boolean $flush       Whether to flush the cache first or not.
+ *
+ * @return array
+ */
+function get_customers_for_product( $product_id = 0, $flush = false ) {
+
+	// Make sure we have a product ID.
+	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
+		return new WP_Error( 'invalid_product_id', __( 'The required product ID is missing or invalid.', 'woo-interest-in-products' ) );
+	}
+
+	// Make sure we have an enabled product.
+	if ( ! Helpers\maybe_product_enabled( $product_id ) ) {
+		return new WP_Error( 'product_not_enabled', __( 'Subscriptions are not enabled for this product.', 'woo-interest-in-products' ) );
+	}
+
+	// Set my transient key.
+	$ky = 'woo_product_interest_customers_' . absint( $product_id );
+
+	// If we don't want the cache'd version, delete the transient first.
+	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		delete_transient( $ky );
+	}
+
+	// Check the transient.
+	if ( false === $customers = get_transient( $ky )  ) {
+
+		// Call the global database.
+		global $wpdb;
+
+		// Set our various table names.
+		$table  = $wpdb->prefix . Core\TABLE_NAME;
+
+		// Set up our query.
+		$setup  = $wpdb->prepare("
+			SELECT   *
+			FROM     $table
+			WHERE    product_id = '%d'
+			ORDER BY created ASC
+		", absint( $product_id ) );
+
+		// Process the query.
+		$query  = $wpdb->get_results( $setup, ARRAY_A );
+
+		// If we came back empty, check for an error return.
+		if ( ! $query ) {
+
+			// Return the WP_Error item if we have it, otherwise a generic false.
+			if ( $wpdb->last_error ) {
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
+			} else {
+				return false;
+			}
+		}
+
+		// Make sure they're unique.
+		$customers  = Helpers\sanitize_text_recursive( $query );
+
+		// Set our transient with our data.
+		set_transient( $ky, $customers, HOUR_IN_SECONDS );
+	}
+
+	// Return the array of user IDs, filtering out the duplicates.
+	return $customers;
 }
 
 /**
@@ -216,11 +221,11 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 
 	// Make sure we have a user ID.
 	if ( empty( $customer_id ) ) {
-		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_customer_id', __( 'The required customer ID is missing.', 'woo-interest-in-products' ) );
 	}
 
 	// Set my transient key.
-	$ky = 'woo_customer_subscribed_products_' . absint( $customer_id );
+	$ky = 'woo_customer_interest_products_' . absint( $customer_id );
 
 	// If we don't want the cache'd version, delete the transient first.
 	if ( ! empty( $flush ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -233,10 +238,13 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 		// Call the global database.
 		global $wpdb;
 
+		// Set our various table names.
+		$table  = $wpdb->prefix . Core\TABLE_NAME;
+
 		// Set up our query.
 		$setup  = $wpdb->prepare("
 			SELECT   *
-			FROM     $wpdb->wc_product_subscriptions
+			FROM     $table
 			WHERE    customer_id = '%d'
 			ORDER BY created ASC
 		", absint( $customer_id ) );
@@ -249,7 +257,7 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
 			if ( $wpdb->last_error ) {
-				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
 			} else {
 				return false;
 			}
@@ -277,7 +285,7 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 
 	// Make sure we have a relationship ID.
 	if ( empty( $relationship_id ) ) {
-		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-subscribe-to-products' ) );
+		return new WP_Error( 'missing_relationship_id', __( 'The required relationship ID is missing.', 'woo-interest-in-products' ) );
 	}
 
 	// Set my transient key.
@@ -294,10 +302,13 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 		// Call the global database.
 		global $wpdb;
 
+		// Set our various table names.
+		$table  = $wpdb->prefix . Core\TABLE_NAME;
+
 		// Set up our query.
 		$setup  = $wpdb->prepare("
 			SELECT   *
-			FROM     $wpdb->wc_product_subscriptions
+			FROM     $table
 			WHERE    relationship_id = '%d'
 			ORDER BY created ASC
 		", absint( $relationship_id ) );
@@ -310,7 +321,7 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 
 			// Return the WP_Error item if we have it, otherwise a generic false.
 			if ( $wpdb->last_error ) {
-				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+				return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
 			} else {
 				return false;
 			}
@@ -353,10 +364,13 @@ function get_all_subscription_data() {
 	// Call the global database.
 	global $wpdb;
 
+	// Set our various table names.
+	$table  = $wpdb->prefix . Core\TABLE_NAME;
+
 	// Set up our query.
 	$setup  = $wpdb->prepare("
 		SELECT   relationship_id
-		FROM     $wpdb->wc_product_subscriptions
+		FROM     $table
 		ORDER BY '%s' ASC
 	", esc_attr( 'created' ) );
 
@@ -368,7 +382,7 @@ function get_all_subscription_data() {
 
 		// Return the WP_Error item if we have it, otherwise a generic false.
 		if ( $wpdb->last_error ) {
-			return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-subscribe-to-products' ), $wpdb->last_error );
+			return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
 		} else {
 			return false;
 		}

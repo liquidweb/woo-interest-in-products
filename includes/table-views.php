@@ -2,15 +2,15 @@
 /**
  * Our table setup for the handling the data pieces.
  *
- * @package WooSubscribeToProducts
+ * @package WooInterestInProducts
  */
 
 // Set our aliases.
-use LiquidWeb\WooSubscribeToProducts as Core;
-use LiquidWeb\WooSubscribeToProducts\Helpers as Helpers;
-use LiquidWeb\WooSubscribeToProducts\Database as Database;
-use LiquidWeb\WooSubscribeToProducts\Queries as Queries;
-use LiquidWeb\WooSubscribeToProducts\DataExport as Export;
+use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Database as Database;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
+use LiquidWeb\WooInterestInProducts\DataExport as Export;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -24,7 +24,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 /**
  * Create a new table class that will extend the WP_List_Table.
  */
-class SingleProductSubscriptions_Table extends WP_List_Table {
+class ProductInterestSignups_Table extends WP_List_Table {
 
 	/**
 	 * SingleProductSubscriptions_Table constructor.
@@ -36,8 +36,8 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Set parent defaults.
 		parent::__construct( array(
-			'singular' => __( 'Single Product Subscriptions', 'liquidweb-woocommerce-gdpr' ),
-			'plural'   => __( 'Single Product Subscriptions', 'liquidweb-woocommerce-gdpr' ),
+			'singular' => __( 'Product Interest Signup', 'woo-interest-in-products' ),
+			'plural'   => __( 'Product Interest Signups', 'woo-interest-in-products' ),
 			'ajax'     => false,
 		) );
 	}
@@ -56,7 +56,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$dataset    = $this->table_data();
 
 		// Check for the _POST value to filter.
-		if ( ! empty( $_POST['wc-product-subs-filter-submit' ] ) ) {
+		if ( ! empty( $_POST['wc-product-interest-filter-submit' ] ) ) {
 			$dataset    = $this->maybe_filter_dataset( $dataset );
 		}
 
@@ -101,10 +101,10 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		// Build our array of column setups.
 		$setup  = array(
 			'cb'            => '<input type="checkbox" />',
-			'visible_name'  => __( 'Customer Name', 'woo-subscribe-to-products' ),
-			'product_name'  => __( 'Product Name', 'woo-subscribe-to-products' ),
-			'signup_date'   => __( 'Signup Date', 'woo-subscribe-to-products' ),
-			'action_list'   => __( 'Actions', 'woo-subscribe-to-products' ),
+			'visible_name'  => __( 'Customer Name', 'woo-interest-in-products' ),
+			'product_name'  => __( 'Product Name', 'woo-interest-in-products' ),
+			'signup_date'   => __( 'Signup Date', 'woo-interest-in-products' ),
+			'action_list'   => __( 'Actions', 'woo-interest-in-products' ),
 		);
 
 		// Return filtered.
@@ -119,7 +119,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	public function display() {
 
 		// Add a nonce for the bulk action.
-		wp_nonce_field( 'wc_product_subs_nonce_action', 'wc_product_subs_nonce_name' );
+		wp_nonce_field( 'wc_product_interest_nonce_action', 'wc_product_interest_nonce_name' );
 
 		// And the parent display (which is most of it).
 		parent::display();
@@ -147,7 +147,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 			$this->customer_filter_dropdown();
 
 			// And handle our button.
-			echo '<button class="button action" name="wc-product-subs-filter-submit" type="submit" value="1">' . esc_html__( 'Filter', 'woo-subscribe-to-products' ) . '</button>';
+			echo '<button class="button action" name="wc-product-interest-filter-submit" type="submit" value="1">' . esc_html__( 'Filter', 'woo-interest-in-products' ) . '</button>';
 
 		// Close the div.
 		echo '</div>';
@@ -174,16 +174,16 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$build  = '';
 
 		// Wrap the product dropdown in a div.
-		$build .= '<div class="wc-product-subs-table-filter wc-product-subs-table-filter-products">';
+		$build .= '<div class="wc-product-interest-table-filter wc-product-interest-table-filter-products">';
 
 			// Handle our screen reader label.
-			$build .= '<label class="screen-reader-text" for="wc-product-subs-product-filter">' . esc_html__( 'Filter by product', 'woo-subscribe-to-products' ) . '</label>';
+			$build .= '<label class="screen-reader-text" for="wc-product-interest-product-filter">' . esc_html__( 'Filter by product', 'woo-interest-in-products' ) . '</label>';
 
 			// Begin the select dropdown.
-			$build .= '<select name="wc-product-subs-product-filter" id="wc-product-subs-product-filter" class="postform">';
+			$build .= '<select name="wc-product-interest-product-filter" id="wc-product-interest-product-filter" class="postform">';
 
 				// Load our null value.
-				$build .= '<option value="0">' . esc_html__( 'All Products', 'woo-subscribe-to-products' ) . '</option>';
+				$build .= '<option value="0">' . esc_html__( 'All Products', 'woo-interest-in-products' ) . '</option>';
 
 				// Now loop my product IDs and show them.
 				foreach ( $enabled_products as $product_id ) {
@@ -231,16 +231,16 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$build  = '';
 
 		// Wrap the product dropdown in a div.
-		$build .= '<div class="wc-product-subs-table-filter wc-product-subs-table-filter-customers">';
+		$build .= '<div class="wc-product-interest-table-filter wc-product-interest-table-filter-customers">';
 
 			// Handle our screen reader label.
-			$build .= '<label class="screen-reader-text" for="wc-product-subs-customer-filter">' . esc_html__( 'Filter by customer', 'woo-subscribe-to-products' ) . '</label>';
+			$build .= '<label class="screen-reader-text" for="wc-product-interest-customer-filter">' . esc_html__( 'Filter by customer', 'woo-interest-in-products' ) . '</label>';
 
 			// Begin the select dropdown.
-			$build .= '<select name="wc-product-subs-customer-filter" id="wc-product-subs-customer-filter" class="postform">';
+			$build .= '<select name="wc-product-interest-customer-filter" id="wc-product-interest-customer-filter" class="postform">';
 
 				// Load our null value.
-				$build .= '<option value="0">' . esc_html__( 'All Customers', 'woo-subscribe-to-products' ) . '</option>';
+				$build .= '<option value="0">' . esc_html__( 'All Customers', 'woo-interest-in-products' ) . '</option>';
 
 				// Now loop my customers and show them.
 				foreach ( $current_customers as $customer_id => $customer_data ) {
@@ -311,8 +311,8 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Make a basic array of the actions we wanna include.
 		$setup  = array(
-			'wc_product_subs_unsubscribe' => __( 'Unsubscribe', 'woo-subscribe-to-products' ),
-			'wc_product_subs_export'      => __( 'Export', 'woo-subscribe-to-products' )
+			'wc_product_interest_unsubscribe' => __( 'Unsubscribe', 'woo-interest-in-products' ),
+			'wc_product_interest_export'      => __( 'Export', 'woo-interest-in-products' )
 		);
 
 		// Return it filtered.
@@ -337,26 +337,26 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		}
 
 		// Fail on a missing or bad nonce.
-		if ( empty( $_POST['wc_product_subs_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_subs_nonce_name'], 'wc_product_subs_nonce_action' ) ) {
+		if ( empty( $_POST['wc_product_interest_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_interest_nonce_name'], 'wc_product_interest_nonce_action' ) ) {
 			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
 		}
 
 		// Check for the array of relationship IDs being passed.
-		if ( empty( $_POST['wc_product_subs_relationship_ids'] ) ) {
+		if ( empty( $_POST['wc_product_interest_ids'] ) ) {
 			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'no_ids' ) );
 		}
 
 		// Set and sanitize my IDs.
-		$relationship_ids   = array_map( 'absint', $_POST['wc_product_subs_relationship_ids'] );
+		$relationship_ids   = array_map( 'absint', $_POST['wc_product_interest_ids'] );
 
 		// Handle my different bulk actions.
 		switch ( $this->current_action() ) {
 
-			case 'wc_product_subs_unsubscribe' :
+			case 'wc_product_interest_unsubscribe' :
 				$this->process_bulk_unsubscribe( $relationship_ids );
 				break;
 
-			case 'wc_product_subs_export' :
+			case 'wc_product_interest_export' :
 				$this->process_bulk_export( $relationship_ids );
 				break;
 
@@ -387,13 +387,13 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		}
 
 		// If we had customer IDs passed, filter and purge transients.
-		if ( ! empty( $_POST['wc_product_subs_customer_ids'] ) ) {
-			$this->purge_customer_transients( $_POST['wc_product_subs_customer_ids'] );
+		if ( ! empty( $_POST['wc_product_interest_customer_ids'] ) ) {
+			$this->purge_customer_transients( $_POST['wc_product_interest_customer_ids'] );
 		}
 
 		// If we had product IDs passed, filter and purge transients.
-		if ( ! empty( $_POST['wc_product_subs_product_ids'] ) ) {
-			$this->purge_product_transients( $_POST['wc_product_subs_product_ids'] );
+		if ( ! empty( $_POST['wc_product_interest_product_ids'] ) ) {
+			$this->purge_product_transients( $_POST['wc_product_interest_product_ids'] );
 		}
 
 		// Redirect to the success.
@@ -415,13 +415,13 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		}
 
 		// Add our option key to get later.
-		update_option( 'wc_product_subs_export_ids', $relationship_ids, 'no' );
+		update_option( 'wc_product_interest_export_ids', $relationship_ids, 'no' );
 
 		// Set the nonce for the export.
-		$nonce  = wp_create_nonce( 'wc_product_subs_export' );
+		$nonce  = wp_create_nonce( 'wc_product_interest_export' );
 
 		// Redirect to trigger the export function.
-		Helpers\admin_page_redirect( array( 'wc_product_subs_export' => 1, 'nonce' => esc_attr( $nonce ) ), false );
+		Helpers\admin_page_redirect( array( 'wc_product_interest_export' => 1, 'nonce' => esc_attr( $nonce ) ), false );
 	}
 
 	/**
@@ -458,7 +458,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 
 		// Now loop and purge.
 		foreach ( $product_ids as $product_id ) {
-			delete_transient( 'woo_product_subscribed_customers_' . absint( $product_id ) );
+			delete_transient( 'woo_product_interest_customers_' . absint( $product_id ) );
 		}
 	}
 
@@ -475,7 +475,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$id = absint( $item['id'] );
 
 		// Return my checkbox.
-		return '<input type="checkbox" name="wc_product_subs_relationship_ids[]" class="wc-product-subscriptions-admin-checkbox" id="cb-' . $id . '" value="' . $id . '" /><label for="cb-' . $id . '" class="screen-reader-text">' . __( 'Select subscription', 'woo-subscribe-to-products' ) . '</label>';
+		return '<input type="checkbox" name="wc_product_interest_ids[]" class="wc-product-interest-admin-checkbox" id="cb-' . $id . '" value="' . $id . '" /><label for="cb-' . $id . '" class="screen-reader-text">' . __( 'Select signup', 'woo-interest-in-products' ) . '</label>';
 	}
 
 	/**
@@ -496,7 +496,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$setup .= '</span>';
 
 		// Add a hidden field with the value.
-		$setup .= '<input type="hidden" name="wc_product_subs_customer_ids[]" value="' . absint( $item['customer_id'] ) . '">';
+		$setup .= '<input type="hidden" name="wc_product_interest_customer_ids[]" value="' . absint( $item['customer_id'] ) . '">';
 
 		// Create my formatted date.
 		$setup  = apply_filters( Core\HOOK_PREFIX . 'column_visible_name', $setup, $item );
@@ -526,15 +526,15 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$setup .= '<div class="row-actions wc-product-subscriptions-admin-table-actions">';
 
 			// Show the view link.
-			$setup .= '<a title="' . __( 'View Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['product_link'] ) . '">' . esc_html__( 'View Product', 'woo-subscribe-to-products' ) . '</a>';
+			$setup .= '<a title="' . __( 'View Product', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['product_link'] ) . '">' . esc_html__( 'View Product', 'woo-interest-in-products' ) . '</a>';
 
 			$setup .= '&nbsp;|&nbsp;';
 
 			// Show the edit link.
-			$setup .= '<a title="' . __( 'Edit Product', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['product_edit'] ) . '">' . esc_html__( 'Edit Product', 'woo-subscribe-to-products' ) . '</a>';
+			$setup .= '<a title="' . __( 'Edit Product', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['product_edit'] ) . '">' . esc_html__( 'Edit Product', 'woo-interest-in-products' ) . '</a>';
 
 			// Add a hidden field with the value.
-			$setup .= '<input type="hidden" name="wc_product_subs_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
+			$setup .= '<input type="hidden" name="wc_product_interest_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
 
 		// And close the div.
 		$setup .= '</div>';
@@ -559,7 +559,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		$stamp  = strtotime( $item['signup_date'] );
 
 		// Get my relative date.
-		$show   = sprintf( _x( '%s ago', '%s = human-readable time difference', 'woo-subscribe-to-products' ), human_time_diff( $stamp, current_time( 'timestamp', 1 ) ) );
+		$show   = sprintf( _x( '%s ago', '%s = human-readable time difference', 'woo-interest-in-products' ), human_time_diff( $stamp, current_time( 'timestamp', 1 ) ) );
 
 		// Build my markup.
 		$setup  = '';
@@ -644,7 +644,7 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 	protected function maybe_filter_dataset( $dataset = array() ) {
 
 		// Return the dataset we got if we don't have the submit.
-		if ( empty( $_POST['wc-product-subs-filter-submit' ] ) ) {
+		if ( empty( $_POST['wc-product-interest-filter-submit' ] ) ) {
 			return $dataset;
 		}
 
@@ -654,18 +654,18 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		}
 
 		// Fail on a missing or bad nonce.
-		if ( empty( $_POST['wc_product_subs_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_subs_nonce_name'], 'wc_product_subs_nonce_action' ) ) {
+		if ( empty( $_POST['wc_product_interest_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_interest_nonce_name'], 'wc_product_interest_nonce_action' ) ) {
 			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
 		}
 
 		// Handle a product ID filter.
-		if ( ! empty( $_POST['wc-product-subs-product-filter'] ) && 'product' === get_post_type( absint( $_POST['wc-product-subs-product-filter'] ) ) ) {
-			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-subs-product-filter'] ), 'product_id' );
+		if ( ! empty( $_POST['wc-product-interest-product-filter'] ) && 'product' === get_post_type( absint( $_POST['wc-product-interest-product-filter'] ) ) ) {
+			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-interest-product-filter'] ), 'product_id' );
 		}
 
 		// Handle a customer ID filter.
-		if ( ! empty( $_POST['wc-product-subs-customer-filter'] ) ) {
-			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-subs-customer-filter'] ), 'customer_id' );
+		if ( ! empty( $_POST['wc-product-interest-customer-filter'] ) ) {
+			$dataset    = $this->filter_dataset_by_id( $dataset, absint( $_POST['wc-product-interest-customer-filter'] ), 'customer_id' );
 		}
 
 		// And return the dataset, however we have it.
@@ -746,11 +746,11 @@ class SingleProductSubscriptions_Table extends WP_List_Table {
 		// Set up our array of items.
 		$setup = array(
 
-			'view'   => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-view" title="' . __( 'View Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['customer_edit'] ) . '">' . esc_html( 'View Customer', 'woo-subscribe-to-products' ) . '</a>',
+			'view'   => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-view" title="' . __( 'View Customer', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['customer_edit'] ) . '">' . esc_html( 'View Customer', 'woo-interest-in-products' ) . '</a>',
 
-			'orders' => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-orders" title="' . __( 'View Orders', 'woo-subscribe-to-products' ) . '" href="' . esc_url( $item['customer_orders'] ) . '">' . esc_html( 'View Orders', 'woo-subscribe-to-products' ) . '</a>',
+			'orders' => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-orders" title="' . __( 'View Orders', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['customer_orders'] ) . '">' . esc_html( 'View Orders', 'woo-interest-in-products' ) . '</a>',
 
-			'email'  => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-email" title="' . __( 'Email Customer', 'woo-subscribe-to-products' ) . '" href="' . esc_url( 'mailto:' . antispambot( $item['customer_email'] ) ) . '">' . esc_html( 'Email Customer', 'woo-subscribe-to-products' ) . '</a>',
+			'email'  => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-email" title="' . __( 'Email Customer', 'woo-interest-in-products' ) . '" href="' . esc_url( 'mailto:' . antispambot( $item['customer_email'] ) ) . '">' . esc_html( 'Email Customer', 'woo-interest-in-products' ) . '</a>',
 		);
 
 		// Return our row actions.
