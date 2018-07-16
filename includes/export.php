@@ -72,7 +72,8 @@ function export_subscription_data() {
 			$single['customer']['display_name'],
 			$single['customer']['user_email'],
 			$single['product']['post_title'],
-			$single['signup'],
+			$single['product']['product_sku'],
+			$single['signup_date'],
 		);
 
 		// Allow each array to be filtered before etting added.
@@ -120,6 +121,7 @@ function get_export_headers() {
 		__( 'Customer Name', 'woo-interest-in-products' ),
 		__( 'Customer Email', 'woo-interest-in-products' ),
 		__( 'Product Name', 'woo-interest-in-products' ),
+		__( 'Product SKU', 'woo-interest-in-products' ),
 		__( 'Signup Date', 'woo-interest-in-products' ),
 	);
 

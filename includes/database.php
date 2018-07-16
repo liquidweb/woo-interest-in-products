@@ -12,6 +12,8 @@ namespace LiquidWeb\WooInterestInProducts\Database;
 use LiquidWeb\WooInterestInProducts as Core;
 use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
 
+use WP_Error;
+
 /**
  * Start our engines.
  */
@@ -111,7 +113,7 @@ function install_table() {
 			relationship_id bigint(20) NOT NULL AUTO_INCREMENT,
 			product_id bigint(20) NOT NULL,
 			customer_id bigint(20) NOT NULL,
-			created datetime NOT NULL,
+			signup_date datetime NOT NULL,
 		PRIMARY KEY  (relationship_id),
 		KEY product_id (product_id),
 		KEY customer_id (customer_id)
@@ -154,7 +156,7 @@ function insert( $customer_id = 0, $products = array() ) {
 	global $wpdb;
 
 	// Set our created time.
-	$create = current_time( 'mysql' );
+	$signup = current_time( 'mysql' );
 
 	// Loop my products and confirm each one.
 	foreach ( $products as $product_id ) {
@@ -165,7 +167,7 @@ function insert( $customer_id = 0, $products = array() ) {
 		}
 
 		// Set my insert data.
-		$insert = array( 'product_id' => $product_id, 'customer_id' => $customer_id, 'created' => $create );
+		$insert = array( 'product_id' => $product_id, 'customer_id' => $customer_id, 'signup_date' => $signup );
 
 		// Filter our inserted data.
 		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $customer_id, $product_id );
@@ -267,4 +269,8 @@ function delete_by_relationship( $relationship_id = 0 ) {
 
 	// Run my delete function.
 	$delete = $wpdb->delete( $wpdb->wc_product_interest, array( 'relationship_id' => absint( $relationship_id ) ) );
+
+	// Delete the relevant transients.
+	delete_transient( 'woo_product_interest_customers_all' );
+	delete_transient( 'woo_customer_relationship_data_' . absint( $relationship_id ) );
 }

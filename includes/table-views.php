@@ -101,7 +101,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Build our array of column setups.
 		$setup  = array(
 			'cb'            => '<input type="checkbox" />',
-			'visible_name'  => __( 'Customer Name', 'woo-interest-in-products' ),
+			'customer_name' => __( 'Customer Name', 'woo-interest-in-products' ),
 			'product_name'  => __( 'Product Name', 'woo-interest-in-products' ),
 			'signup_date'   => __( 'Signup Date', 'woo-interest-in-products' ),
 			'action_list'   => __( 'Actions', 'woo-interest-in-products' ),
@@ -146,6 +146,9 @@ class ProductInterestSignups_Table extends WP_List_Table {
 			// The customer dropdown.
 			$this->customer_filter_dropdown();
 
+			// Handle adding additional table nav actions.
+			do_action( Core\HOOK_PREFIX . 'extra_tablenav', '', $which );
+
 			// And handle our button.
 			echo '<button class="button action" name="wc-product-interest-filter-submit" type="submit" value="1">' . esc_html__( 'Filter', 'woo-interest-in-products' ) . '</button>';
 
@@ -170,6 +173,9 @@ class ProductInterestSignups_Table extends WP_List_Table {
 			return;
 		}
 
+		// See if we have one selected already.
+		$select = ! empty( $_POST['wc-product-interest-product-filter'] ) ? absint( $_POST['wc-product-interest-product-filter'] ) : 0;
+
 		// Set an empty.
 		$build  = '';
 
@@ -192,7 +198,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 					$pname  = get_the_title( $product_id );
 
 					// And load the dropdown.
-					$build .= '<option value="' . absint( $product_id ) . '">' . esc_html( $pname ) . '</option>';
+					$build .= '<option value="' . absint( $product_id ) . '" ' . selected( $select, absint( $product_id ), 0 ) . '>' . esc_html( $pname ) . '</option>';
 				}
 
 			// Close the select.
@@ -227,6 +233,9 @@ class ProductInterestSignups_Table extends WP_List_Table {
 			return;
 		}
 
+		// See if we have one selected already.
+		$select = ! empty( $_POST['wc-product-interest-customer-filter'] ) ? absint( $_POST['wc-product-interest-customer-filter'] ) : 0;
+
 		// Set an empty.
 		$build  = '';
 
@@ -244,7 +253,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 
 				// Now loop my customers and show them.
 				foreach ( $current_customers as $customer_id => $customer_data ) {
-					$build .= '<option value="' . absint( $customer_id ) . '">' . esc_html( $customer_data['display_name'] ) . '</option>';
+					$build .= '<option value="' . absint( $customer_id ) . '" ' . selected( $select, absint( $customer_id ), 0 ) . '>' . esc_html( $customer_data['display_name'] ) . '</option>';
 				}
 
 			// Close the select.
@@ -284,7 +293,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 
 		// Build our array of sortable columns.
 		$setup  = array(
-			'visible_name'  => array( 'visible_name', false ),
+			'customer_name' => array( 'customer_name', false ),
 			'product_name'  => array( 'product_name', true ),
 			'signup_date'   => array( 'signup_date', true ),
 		);
@@ -299,6 +308,8 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 * @return array
 	 */
 	public function get_hidden_columns() {
+
+		// Return a blank array, filtered.
 		return apply_filters( Core\HOOK_PREFIX . 'table_hidden_columns', array() );
 	}
 
@@ -485,21 +496,18 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
-	protected function column_visible_name( $item ) {
+	protected function column_customer_name( $item ) {
 
 		// Build my markup.
 		$setup  = '';
 
 		// Set the display name.
-		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-name">';
-			$setup .= '<strong>' . esc_html( $item['customer_name'] ) . '</strong>';
+		$setup .= '<span class="wc-product-interest-admin-table-display wc-product-interest-admin-table-customer-name">';
+			$setup .= esc_html( $item['customer_name'] );
 		$setup .= '</span>';
 
-		// Add a hidden field with the value.
-		$setup .= '<input type="hidden" name="wc_product_interest_customer_ids[]" value="' . absint( $item['customer_id'] ) . '">';
-
 		// Create my formatted date.
-		$setup  = apply_filters( Core\HOOK_PREFIX . 'column_visible_name', $setup, $item );
+		$setup  = apply_filters( Core\HOOK_PREFIX . 'column_customer_name', $setup, $item );
 
 		// Return, along with our row actions.
 		return $setup . $this->row_actions( $this->setup_row_action_items( $item ) );
@@ -517,29 +525,22 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Build my markup.
 		$setup  = '';
 
-		// Set the product name name.
-		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-product-name">';
-			$setup .= '<strong>' . esc_html( $item['product_name'] ) . '</strong>';
+		// Set the product name.
+		$setup .= '<span class="wc-product-interest-admin-table-display wc-product-interest-admin-table-product-name">';
+			$setup .= esc_html( $item['product_name'] );
 		$setup .= '</span>';
 
-		// Include the various product links.
-		$setup .= '<div class="row-actions wc-product-subscriptions-admin-table-actions">';
+		// Include the SKU if we have one.
+		if ( ! empty( $item['product_sku'] ) ) {
 
-			// Show the view link.
-			$setup .= '<a title="' . __( 'View Product', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['product_link'] ) . '">' . esc_html__( 'View Product', 'woo-interest-in-products' ) . '</a>';
+			// Output the SKU field.
+			$setup .= '<span class="wc-product-interest-admin-table-display wc-product-interest-admin-table-small-line wc-product-interest-admin-table-product-sku">';
+				$setup .= '<label>' . esc_html__( 'SKU', 'woo-interest-in-products' ) . '</label>: ' . esc_html( $item['product_sku'] );
+			$setup .= '</span>';
 
-			$setup .= '&nbsp;|&nbsp;';
+		}
 
-			// Show the edit link.
-			$setup .= '<a title="' . __( 'Edit Product', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['product_edit'] ) . '">' . esc_html__( 'Edit Product', 'woo-interest-in-products' ) . '</a>';
-
-			// Add a hidden field with the value.
-			$setup .= '<input type="hidden" name="wc_product_interest_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
-
-		// And close the div.
-		$setup .= '</div>';
-
-		// Return my formatted date.
+		// Return my formatted product name.
 		return apply_filters( Core\HOOK_PREFIX . 'column_product_name', $setup, $item );
 	}
 
@@ -552,22 +553,20 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 */
 	protected function column_signup_date( $item ) {
 
-		// Grab the desired date foramtting.
-		$format = apply_filters( Core\HOOK_PREFIX . 'column_date_format', get_option( 'date_format', 'Y-m-d' ) );
-
-		// Set the date to a stamp.
-		$stamp  = strtotime( $item['signup_date'] );
-
-		// Get my relative date.
-		$show   = sprintf( _x( '%s ago', '%s = human-readable time difference', 'woo-interest-in-products' ), human_time_diff( $stamp, current_time( 'timestamp', 1 ) ) );
+		// Fetch our date setup.
+		$date_setup = Helpers\build_date_display( $item['signup_date'] );
 
 		// Build my markup.
 		$setup  = '';
 
-		// Set the product name name.
-		$setup .= '<span class="wc-product-subscriptions-admin-table-display wc-product-subscriptions-admin-table-signup-date">';
-			$setup .= date( $format, $stamp ) . '<br>';
-			$setup .= '<small><em>' . esc_html( $show ) . '</em></small>';
+		// Set the signup date formatted.
+		$setup .= '<span class="wc-product-interest-admin-table-display wc-product-interest-admin-table-signup-date">';
+			$setup .= esc_html( $date_setup['formatted'] );
+		$setup .= '</span>';
+
+		// Set the signup date relative.
+		$setup .= '<span class="wc-product-interest-admin-table-display wc-product-interest-admin-table-small-line wc-product-interest-admin-table-signup-relative">';
+			$setup .= esc_html( $date_setup['relative'] );
 		$setup .= '</span>';
 
 		// Return my formatted date.
@@ -583,8 +582,142 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 */
 	protected function column_action_list( $item ) {
 
-		// This is clearly a placeholder.
-		return 'This is here until other things are.';
+		// Get my list of items.
+		$action_list_args   = $this->column_action_list_args( $item );
+
+		// Bail if nothing.
+		if ( ! $action_list_args ) {
+			return apply_filters( Core\HOOK_PREFIX . 'column_action_list', '', $item );
+		}
+
+		// Build my markup.
+		$setup  = '';
+
+		// Set up our list.
+		$setup .= '<ul class="wc-product-interest-admin-list-wrap">';
+
+		// Loop my list args and build out.
+		foreach ( $action_list_args as $action => $args ) {
+
+			// Create our class.
+			$class  = 'wc-product-interest-admin-list-item wc-product-interest-admin-list-item-' . sanitize_html_class( $action );
+
+			// Create our label.
+			$label  = esc_html( $args['label'] );
+
+			// Add the icon if we have it.
+			if ( ! empty( $args['icon'] ) ) {
+				$label  = '<i class="wc-product-interest-admin-icon dashicons ' . esc_attr( $args['icon'] ) . '"></i> ' . $label;
+			}
+
+			// Open the individual list item.
+			$setup .= '<li class="' . esc_attr( $class ) . '">';
+
+				// Set the link.
+				$setup .= '<a href="' . esc_url( $args['link'] ) . '">' . $label . '</a>';
+
+			// Close the individual list item.
+			$setup .= '</li>';
+		}
+
+		// Close up the list.
+		$setup .= '</ul>';
+
+		// Add a hidden field with the customer ID.
+		$setup .= $this->column_action_hidden_ids( $item );
+
+		// Return the whole thing, filtered.
+		return apply_filters( Core\HOOK_PREFIX . 'column_action_list', $setup, $item );
+	}
+
+	/**
+	 * The data for our actions column.
+	 *
+	 * @param  array  $item  The item from the data array.
+	 *
+	 * @return string
+	 */
+	private function column_action_list_args( $item ) {
+
+		// Set up our array of items.
+		$setup = array(
+
+			// The "view customer" link.
+			'view'      => array(
+				'label' => __( 'View Customer', 'woo-interest-in-products' ),
+				'link'  => $item['customer_edit'],
+				'icon'  => 'dashicons-id',
+			),
+
+			// The "view orders" link.
+			'orders'    => array(
+				'label' => __( 'View Orders', 'woo-interest-in-products' ),
+				'link'  => $item['customer_orders'],
+				'icon'  => 'dashicons-cart',
+			),
+
+			// The "view product" link.
+			'product'   => array(
+				'label' => __( 'View Product', 'woo-interest-in-products' ),
+				'link'  => $item['product_edit'],
+				'icon'  => 'dashicons-album',
+			),
+
+		);
+
+		// Return my setup of links.
+		return apply_filters( Core\HOOK_PREFIX . 'column_action_list_args', $setup, $item );
+	}
+
+	/**
+	 * Our two hidden fields for the IDs we need.
+	 *
+	 * @param  array  $item  The item from the data array.
+	 *
+	 * @return string
+	 */
+	private function column_action_hidden_ids( $item ) {
+
+		// Bail if no item was passed.
+		if ( ! $item ) {
+			return;
+		}
+
+		// Set our empty.
+		$build  = '';
+
+		// Add the customer ID, assuming we have one.
+		if ( ! empty( $item['customer_id'] ) ) {
+			$build .= '<input type="hidden" name="wc_product_interest_customer_ids[]" value="' . absint( $item['customer_id'] ) . '">';
+		}
+
+		// Add the product ID, assuming we have one.
+		if ( ! empty( $item['product_id'] ) ) {
+			$build .= '<input type="hidden" name="wc_product_interest_product_ids[]" value="' . absint( $item['product_id'] ) . '">';
+		}
+
+		// Return my hidden field builds.
+		return apply_filters( Core\HOOK_PREFIX . 'column_action_hidden_ids', $build, $item );
+	}
+
+	/**
+	 * Message to be displayed when there are no items
+	 *
+	 */
+	public function no_items() {
+
+		// If we have no filtering, return the default.
+		if ( empty( $_POST['wc-product-interest-filter-submit'] ) ) {
+
+			// Echo out the message.
+			echo apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', '<em>' . esc_html__( 'No current signups were found.', 'woo-interest-in-products' ) . '</em>', false );
+
+			// And return, so we don't mess with it more.
+			return;
+		}
+
+		// Echo out the 'no items' verbiage.
+		echo apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', '<em>' . esc_html__( 'No signups for the selected products or customers were found.', 'woo-interest-in-products' ) . '</em>', true );
 	}
 
 	/**
@@ -618,6 +751,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 				'product_name'    => esc_attr( $relationship_data['product']['post_title'] ),
 				'product_edit'    => get_edit_post_link( absint( $relationship_data['product_id'] ), 'raw' ),
 				'product_link'    => get_permalink( absint( $relationship_data['product_id'] ) ),
+				'product_sku'     => esc_attr( $relationship_data['product']['product_sku'] ),
 				'customer_id'     => absint( $relationship_data['customer_id'] ),
 				'customer_name'   => esc_attr( $relationship_data['customer']['display_name'] ),
 				'customer_edit'   => get_edit_user_link( absint( $relationship_data['product_id'] ), 'raw' ),
@@ -714,7 +848,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Run our column switch.
 		switch ( $column_name ) {
 
-			case 'display_name' :
+			case 'customer_name' :
 			case 'product_name' :
 			case 'signup_date' :
 			case 'action_list' :
@@ -742,19 +876,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function setup_row_action_items( $item ) {
-
-		// Set up our array of items.
-		$setup = array(
-
-			'view'   => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-view" title="' . __( 'View Customer', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['customer_edit'] ) . '">' . esc_html( 'View Customer', 'woo-interest-in-products' ) . '</a>',
-
-			'orders' => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-orders" title="' . __( 'View Orders', 'woo-interest-in-products' ) . '" href="' . esc_url( $item['customer_orders'] ) . '">' . esc_html( 'View Orders', 'woo-interest-in-products' ) . '</a>',
-
-			'email'  => '<a class="wc-product-subscriptions-admin-table-link wc-product-subscriptions-admin-table-link-email" title="' . __( 'Email Customer', 'woo-interest-in-products' ) . '" href="' . esc_url( 'mailto:' . antispambot( $item['customer_email'] ) ) . '">' . esc_html( 'Email Customer', 'woo-interest-in-products' ) . '</a>',
-		);
-
-		// Return our row actions.
-		return apply_filters( Core\HOOK_PREFIX . 'table_row_actions', $setup, $item );
+		return apply_filters( Core\HOOK_PREFIX . 'table_row_actions', array(), $item );
 	}
 
 	/**

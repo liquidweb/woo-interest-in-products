@@ -99,7 +99,7 @@ function get_all_customers( $flush = false ) {
 			SELECT   customer_id
 			FROM     $table
 			ORDER BY '%s' ASC
-		", esc_attr( 'created' ) );
+		", esc_attr( 'signup_date' ) );
 
 		// Process the query.
 		$query  = $wpdb->get_col( $setup );
@@ -143,11 +143,12 @@ function get_all_customers( $flush = false ) {
  * Get the customers that have subscribed to a single product.
  *
  * @param  integer $product_id  The product ID to look up.
+ * @param  string  $return      Whether to return the actual data or just the IDs.
  * @param  boolean $flush       Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_customers_for_product( $product_id = 0, $flush = false ) {
+function get_customers_for_product( $product_id = 0, $return = 'data', $flush = false ) {
 
 	// Make sure we have a product ID.
 	if ( empty( $product_id ) || 'product' !== get_post_type( $product_id ) ) {
@@ -181,7 +182,7 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 			SELECT   *
 			FROM     $table
 			WHERE    product_id = '%d'
-			ORDER BY created ASC
+			ORDER BY signup_date ASC
 		", absint( $product_id ) );
 
 		// Process the query.
@@ -206,18 +207,19 @@ function get_customers_for_product( $product_id = 0, $flush = false ) {
 	}
 
 	// Return the array of user IDs, filtering out the duplicates.
-	return $customers;
+	return 'ids' === sanitize_text_field( $return ) ? wp_list_pluck( $customers, 'customer_id' ) : $customers;
 }
 
 /**
  * Get the products that have subscribed by a customer.
  *
  * @param  integer $customer_id  The user ID to look up.
+ * @param  string  $return       Whether to return the actual data or just the IDs.
  * @param  boolean $flush        Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_products_for_customer( $customer_id = 0, $flush = false ) {
+function get_products_for_customer( $customer_id = 0, $return = 'data', $flush = false ) {
 
 	// Make sure we have a user ID.
 	if ( empty( $customer_id ) ) {
@@ -246,7 +248,7 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 			SELECT   *
 			FROM     $table
 			WHERE    customer_id = '%d'
-			ORDER BY created ASC
+			ORDER BY signup_date ASC
 		", absint( $customer_id ) );
 
 		// Process the query.
@@ -270,8 +272,8 @@ function get_products_for_customer( $customer_id = 0, $flush = false ) {
 		set_transient( $ky, $products, HOUR_IN_SECONDS );
 	}
 
-	// Return the array of product IDs, filtering out the duplicates.
-	return $products;
+	// Return the array of product data, filtering out the duplicates.
+	return 'ids' === sanitize_text_field( $return ) ? wp_list_pluck( $products, 'product_id' ) : $products;
 }
 
 /**
@@ -310,7 +312,7 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 			SELECT   *
 			FROM     $table
 			WHERE    relationship_id = '%d'
-			ORDER BY created ASC
+			ORDER BY signup_date ASC
 		", absint( $relationship_id ) );
 
 		// Process the query.
@@ -333,6 +335,9 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 		// Get our initial user object.
 		$user   = get_userdata( absint( $clean['customer_id'] ) );
 
+		// Parse out the SKU.
+		$sku    = get_post_meta( absint( $clean['product_id'] ), '_sku', true );
+
 		// Add the two IDs for easy array picking.
 		$relationship['customer_id'] = absint( $clean['customer_id'] );
 		$relationship['product_id']  = absint( $clean['product_id'] );
@@ -342,9 +347,10 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 
 		// Get the product data, the WP_Post object.
 		$relationship['product']     = (array) get_post( absint( $clean['product_id'] ) );
+		$relationship['product']     = wp_parse_args( array( 'product_sku' => $sku ), $relationship['product'] );
 
 		// And add the signup date.
-		$relationship['signup']     = esc_attr( $clean['created'] );
+		$relationship['signup_date'] = esc_attr( $clean['signup_date'] );
 
 		// Set our transient with our data.
 		set_transient( $ky, $relationship, HOUR_IN_SECONDS );
@@ -357,9 +363,11 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 /**
  * Just get everything for all the things.
  *
+ * @param  string $return  Whether to return the actual data or just the IDs.
+ *
  * @return array
  */
-function get_all_subscription_data() {
+function get_all_subscription_data( $return = 'data' ) {
 
 	// Call the global database.
 	global $wpdb;
@@ -372,7 +380,7 @@ function get_all_subscription_data() {
 		SELECT   relationship_id
 		FROM     $table
 		ORDER BY '%s' ASC
-	", esc_attr( 'created' ) );
+	", esc_attr( 'signup_date' ) );
 
 	// Process the query.
 	$query  = $wpdb->get_col( $setup );
@@ -390,6 +398,11 @@ function get_all_subscription_data() {
 
 	// Make sure all the relationship IDs are valid.
 	$relationship_ids   = array_map( 'absint', $query );
+
+	// If we don't want data, just return the IDs.
+	if ( 'ids' === sanitize_text_field( $return ) ) {
+		return $relationship_ids;
+	}
 
 	// Set our blank.
 	$relationships = array();

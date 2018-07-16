@@ -1,24 +1,33 @@
 
-.lw-woo-gdpr-user-optins-items-list-wrap {
+
+.woo-interest-in-products-subtitle {
+	margin-bottom: 10px;
+}
+
+.woo-interest-in-products-list-wrap {
 
 	list-style-type: none;
-	margin: 0 0 20px;
+	margin: 0 0 20px 10px;
 	padding: 0;
 
 	li {
 
-		.lw-woo-gdpr-user-optins-checkbox-label {
+		.woo-interest-in-products-checkbox-label {
 			display: inline-block;
 		}
 
-		.lw-woo-gdpr-user-optins-required-text {
-			display: inline-block;
-			padding-left: 10px;
-			font-size: 90%;
+
+		.woo-interest-in-products-signup-date {
+			margin-left: 15px;
+			font-size: 85%;
 			font-style: italic;
 		}
-
 	}
+}
+
+
+.woo-interest-in-products-change-submit {
+	margin-bottom: 0;
 }
 
 @media only screen and (max-width: 782px) {}

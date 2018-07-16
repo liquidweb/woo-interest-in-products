@@ -44,6 +44,9 @@ define( __NAMESPACE__ . '\ASSETS_URL', URL . 'assets' );
 // Set our tab base slug constant.
 define( __NAMESPACE__ . '\MENU_SLUG', 'product-interest-list' );
 
+// Set our front menu endpoint constant.
+define( __NAMESPACE__ . '\FRONT_VAR', 'product-interest' );
+
 // Set our custom table name.
 define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_interest' );
 
@@ -59,6 +62,7 @@ define( __NAMESPACE__ . '\PROD_META_KEY', '_product_interest_enabled' );
 // Load the multi-use files.
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/database.php';
+require_once __DIR__ . '/includes/query-mods.php';
 
 // Load the triggered file loads.
 require_once __DIR__ . '/includes/activate.php';
@@ -69,6 +73,7 @@ require_once __DIR__ . '/includes/uninstall.php';
 require_once __DIR__ . '/includes/layout.php';
 require_once __DIR__ . '/includes/queries.php';
 require_once __DIR__ . '/includes/post-meta.php';
+require_once __DIR__ . '/includes/account.php';
 require_once __DIR__ . '/includes/checkout.php';
 require_once __DIR__ . '/includes/export.php';
 require_once __DIR__ . '/includes/table-views.php';

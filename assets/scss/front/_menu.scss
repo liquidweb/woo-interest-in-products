@@ -1,0 +1,24 @@
+
+
+.woocommerce-MyAccount-navigation {
+
+}
+
+	ul {
+
+		.woocommerce-MyAccount-navigation-link {
+
+			&.woocommerce-MyAccount-navigation-link--product-interest {
+
+				a::before {
+					content: "\f481";
+					font-family: dashicons;
+				}
+
+			}
+
+		}
+
+	}
+
+

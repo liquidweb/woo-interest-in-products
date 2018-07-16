@@ -57,7 +57,7 @@ function display_product_interest_fields() {
 	}
 
 	// And spit out the fields.
-	Layout\get_optin_checkout_field( $filter, true );
+	Layout\get_product_interest_checkout_field( $filter, true );
 }
 
 /**
@@ -170,11 +170,16 @@ function update_customer_product_interest( $customer_id, $data ) {
 		return;
 	}
 
-	// Set my products.
-	$items  = array_map( 'absint', $data['product-interest'] );
+	// Filter out anything we're already signed up for.
+	$setup  = sanitize_filter_duplicate_signups( (array) $data['product-interest'], $customer_id );
+
+	// If we have no items left, just bail.
+	if ( ! $setup ) {
+		return;
+	}
 
 	// Run the inserts.
-	$update = Database\insert( $customer_id, (array) $items );
+	$update = Database\insert( $customer_id, (array) $setup );
 
 	// Handle our potential WP Error return.
 	if ( is_wp_error( $update ) ) {
@@ -182,4 +187,46 @@ function update_customer_product_interest( $customer_id, $data ) {
 	}
 
 	// @@todo  handle error / empty return?
+}
+
+/**
+ * Filter out the duplicate items where a customer has signed up.
+ *
+ * @param  array   $product_ids  The existing array of product IDs.
+ * @param  integer $customer_id  The WooCommerce customer ID.
+ *
+ * @return array   $product_ids  The potentially modified array of items.
+ */
+function sanitize_filter_duplicate_signups( $product_ids = array(), $customer_id = 0 ) {
+
+	// Bail if we don't have our pieces.
+	if ( empty( $product_ids ) || empty( $customer_id ) ) {
+		return $product_ids;
+	}
+
+	// Get all the existing relationship data.
+	$existing   = Queries\get_products_for_customer( $customer_id, 'ids' );
+
+	// Bail with no data.
+	if ( ! $existing ) {
+		return $product_ids;
+	}
+
+	// Now loop each product ID.
+	foreach ( $product_ids as $index => $product_id ) {
+
+		// If our ID isn't in the array of existing data, go to the next.
+		if ( ! in_array( $product_id, $existing ) ) {
+			continue;
+		}
+
+		// Unset the index.
+		unset( $product_ids[ $index ] );
+	}
+
+	// Filter any duplicates that exist for some reason.
+	$product_ids    = array_unique( $product_ids );
+
+	// Return false if we unset everything or the IDs with the index reset.
+	return ! empty( $product_ids ) ? array_values( $product_ids ) : false;
 }

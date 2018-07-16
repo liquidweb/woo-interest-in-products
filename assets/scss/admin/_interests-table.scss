@@ -1,6 +1,78 @@
 
+
+.wp-list-table.productinterestsignups {
+
+	tbody {
+
+		th.check-column,
+		td.check-column {
+			padding-top: 8px;
+		}
+	}
+
+}
+
+
 .wc-product-interest-table-filter {
 	display: inline-block;
+}
+
+.wc-product-interest-admin-table-display {
+
+	display: block;
+
+	&.wc-product-interest-admin-table-customer-name {
+		font-size: 110%;
+	}
+
+	&.wc-product-interest-admin-table-product-name {}
+
+	&.wc-product-interest-admin-table-product-sku {
+
+		label {
+			font-style: normal;
+			font-weight: 700;
+			vertical-align: inherit;
+			cursor: default;
+		}
+	}
+
+	&.wc-product-interest-admin-table-signup-date {}
+
+	&.wc-product-interest-admin-table-signup-relative {}
+
+	&.wc-product-interest-admin-table-small-line {
+		font-style: italic;
+		font-size: 90%;
+	}
+
+}
+
+
+.wc-product-interest-admin-list-wrap {
+
+	margin: 0;
+
+	.wc-product-interest-admin-list-item {
+
+		&.wc-product-interest-admin-list-item-view {
+
+		}
+
+		&.wc-product-interest-admin-list-item-orders {
+
+		}
+
+		&.wc-product-interest-admin-list-item-product {
+
+		}
+
+		.wc-product-interest-admin-icon {
+			color: #666;
+			margin-right: 3px;
+		}
+	}
+
 }
 
 

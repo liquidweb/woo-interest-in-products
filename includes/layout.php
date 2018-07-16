@@ -10,6 +10,8 @@ namespace LiquidWeb\WooInterestInProducts\Layout;
 
 // Set our aliases.
 use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Queries as Queries;
 
 /**
  * Build out and return the checkboxes for the checkout.
@@ -19,7 +21,7 @@ use LiquidWeb\WooInterestInProducts as Core;
  *
  * @return HTML
  */
-function get_optin_checkout_field( $products = array(), $echo = false ) {
+function get_product_interest_checkout_field( $products = array(), $echo = false ) {
 
 	// Bail without any data.
 	if ( empty( $products ) || ! is_array( $products ) ) {
@@ -102,6 +104,112 @@ function get_subscribed_customers_list( $customers = array(), $echo = false ) {
 
 	// Close the list.
 	$build .= '</ol>';
+
+	// And echo it out if requested.
+	if ( $echo ) {
+		echo $build; // WPCS: XSS ok.
+	}
+
+	// Just return it.
+	return $build;
+}
+
+/**
+ * Build out and return the list of signed up products by a single customer.
+ *
+ * @param  array   $dataset      The products the customer has signed up.
+ * @param  integer $customer_id  The individual customer ID we're working with.
+ * @param  boolean $echo         Whether to echo it out or return.
+ *
+ * @return HTML
+ */
+function get_single_customer_signups( $dataset = array(), $customer_id = 0, $echo = false ) {
+
+	// If we don't have products, just bail.
+	if ( ! $dataset ) {
+		return;
+	}
+
+	// Get my array of just relationship IDs.
+	$relids = wp_list_pluck( $dataset, 'relationship_id' );
+
+	// Set my form page link.
+	$flink  = Helpers\get_account_tab_link();
+
+	// Set an empty.
+	$build  = '';
+
+	// Describe what to do.
+	$build .= '<p class="woo-interest-in-products-subtitle">' . esc_html__( 'Below are the products you requested to stay informed about. You can review and update them at any time.', 'woo-interest-in-products' ) . '</p>';
+
+	// Set the form.
+	$build .= '<form class="woo-interest-in-products-change-form" action="' . esc_url( $flink ) . '" method="post">';
+
+		// Begin the list output.
+		$build .= '<ul class="woo-interest-in-products-list-wrap">';
+
+		// Now we loop the dataset and show them individually.
+		foreach ( $dataset as $index => $details ) {
+
+			// Grab a few variables.
+			$pslug  = get_post_field( 'post_name', absint( $details['product_id'] ) );
+			$pname  = get_the_title( absint( $details['product_id'] ) );
+			$sdate  = Helpers\build_date_display( $details['signup_date'], 'formatted' );
+
+			// Set some additional items.
+			$li_cls = 'woo-interest-in-products-list-item woo-interest-in-products-list-item-' . sanitize_html_class( $pslug );
+			$inp_id = 'woo-interest-in-products-' . sanitize_html_class( $pslug );
+
+			// And the output.
+			$build .= '<li class="' . esc_attr( $li_cls ) . '">';
+
+				// The big label wrapper.
+				$build .= '<label class="woocommerce-form__label woocommerce-form-' . esc_attr( $pslug ) . '__label woocommerce-form__label-for-checkbox woo-interest-in-products-checkbox-label checkbox">';
+
+					// Our actual checkbox.
+					$build .= '<input class="woocommerce-form__input woocommerce-form-' . esc_attr( $pslug ) . '__input-checkbox woocommerce-form__input-checkbox input-checkbox" name="wc_product_interest_ids[]" id="' . esc_attr( $inp_id ) . '" type="checkbox" value="' . absint( $details['relationship_id'] ) . '" checked="checked" >';
+
+					// Output the product name.
+					$build .= '<span>' . esc_html( $pname ) . '</span>';
+
+				// Close the big-ass label wrap.
+				$build .= '</label>';
+
+				// Include the signup date.
+				$build .= '<span class="woo-interest-in-products-signup-date">';
+					$build .= '(' . sprintf( __( 'Signup Date: %s', 'woo-interest-in-products' ), esc_html( $sdate ) ) . ')';
+				$build .= '</span>';
+
+			// And close the individual list item.
+			$build .= '</li>';
+		}
+
+		// Close the list.
+		$build .= '</ul>';
+
+		// Open the paragraph for the submit button.
+		$build .= '<p class="woo-interest-in-products-change-submit">';
+
+			// Handle the nonce.
+			$build .= wp_nonce_field( 'wc_customer_interests_change_action', 'wc_customer_interests_change_nonce', false, false );
+
+			// The button / action combo.
+			$build .= '<button class="woocommerce-Button button woo-interest-in-products-change-submit-button" type="submit">' . esc_html__( 'Update Your Selections', 'woo-interest-in-products' ) . '</button>';
+
+			// Our little action field.
+			$build .= '<input name="action" value="wc_product_interest_change" type="hidden">';
+
+			// Hidden field for the user ID.
+			$build .= '<input name="wc_product_interest_customer_id" value="' . absint( $customer_id ) . '" type="hidden">';
+
+			// Our hidden field of all original IDs.
+			$build .= '<input name="wc_product_interest_original_ids" value="' . implode( ',', $relids ) . '" type="hidden">';
+
+		// Close the paragraph.
+		$build .= '</p>';
+
+	// Close the form.
+	$build .= '</form>';
 
 	// And echo it out if requested.
 	if ( $echo ) {

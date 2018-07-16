@@ -10,6 +10,7 @@ namespace LiquidWeb\WooInterestInProducts\Helpers;
 
 // Set our aliases.
 use LiquidWeb\WooInterestInProducts as Core;
+use LiquidWeb\WooInterestInProducts\Database as Database;
 
 /**
  * Check a product ID to see if it enabled.
@@ -31,6 +32,70 @@ function maybe_product_enabled( $product_id = 0, $strings = false ) {
 
 	// Return the boolean result.
 	return ! empty( $meta ) ? true : false;
+}
+
+/**
+ * Check if we are on the account privacy data page.
+ *
+ * @param  boolean $in_query  Whether to check inside the actual query.
+ *
+ * @return boolean
+ */
+function maybe_account_endpoint_page( $in_query = false ) {
+
+	// Bail if we aren't on the right general place.
+	if ( is_admin() || ! is_account_page() ) {
+		return false;
+	}
+
+	// Bail if we aren't on the right general place.
+	if ( $in_query && ! in_the_loop() || $in_query && ! is_main_query() ) {
+		return false;
+	}
+
+	// Call the global query object.
+	global $wp_query;
+
+	// Return if we are on our specific var or not.
+	return isset( $wp_query->query_vars[ Core\FRONT_VAR ] ) ? true : false;
+}
+
+/**
+ * Get our "My Account" page to use in the plugin.
+ *
+ * @param  array $args  Any query args to add to the base URL.
+ *
+ * @return string
+ */
+function get_account_tab_link( $args = array() ) {
+
+	// Set my base link.
+	$page   = get_permalink( get_option( 'woocommerce_myaccount_page_id' ) );
+
+	// Add our link.
+	$link   = rtrim( $page, '/' ) . '/' . Core\FRONT_VAR;
+
+	// Return the link with or without args.
+	return ! empty( $args ) ? add_query_arg( $args, $link ) : $link;
+}
+
+/**
+ * Handle our redirect within the admin settings page.
+ *
+ * @param  array $args  The query args to include in the redirect.
+ *
+ * @return void
+ */
+function account_page_redirect( $args = array() ) {
+
+	// Don't redirect if we didn't pass any args.
+	if ( is_admin() || empty( $args ) ) {
+		return;
+	}
+
+	// Do the redirect.
+	wp_redirect( get_account_tab_link( $args ) );
+	exit;
 }
 
 /**
@@ -65,6 +130,33 @@ function filter_product_cart( $cart = array(), $enable = array() ) {
 
 	// Return the array (or empty).
 	return ! empty( $data ) ? $data : false;
+}
+
+/**
+ * Adjust the "My Account" menu to make sure login is at the bottom.
+ *
+ * @param  array $items  Our current array of items.
+ *
+ * @return array $items  The modified array.
+ */
+function adjust_account_tab_order( $items = array() ) {
+
+	// If we don't have the logout link, just return what we have.
+	if ( ! isset( $items['customer-logout'] ) ) {
+		return $items;
+	}
+
+	// Set our logout link.
+	$logout = $items['customer-logout'];
+
+	// Remove the logout.
+	unset( $items['customer-logout'] );
+
+	// Now add it back in.
+	$items['customer-logout'] = $logout;
+
+	// And return the set.
+	return $items;
 }
 
 /**
@@ -215,4 +307,73 @@ function clean_export( $string ) {
 
 		// End all case breaks.
 	}
+}
+
+/**
+ * Take a date in string format and handle the nicer display.
+ *
+ * @param  string $date    The date string.
+ * @param  string $key     Optional single key to return.
+ * @param  string $format  What date formatting we want.
+ *
+ * @return mixed
+ */
+function build_date_display( $date = '', $key = '', $format = '' ) {
+
+	// Bail without a date.
+	if ( empty( $date ) ) {
+		return false;
+	}
+
+	// Grab the desired date formatting.
+	$formatting = ! empty( $format ) ? esc_attr( $format ) : get_option( 'date_format', 'Y-m-d' );
+
+	// Set the date to a stamp.
+	$timestamp  = strtotime( $date );
+
+	// Now set the formatting.
+	$formatted  = date( $formatting, $timestamp );
+
+	// Get my relative date.
+	$relative   = sprintf( _x( '%s ago', '%s = human-readable time difference', 'woo-interest-in-products' ), human_time_diff( $timestamp, current_time( 'timestamp', 1 ) ) );
+
+	// Now set an array of each value.
+	$dataset    = array(
+		'timestamp' => $timestamp,
+		'formatted' => $formatted,
+		'relative'  => $relative,
+	);
+
+	// Return the entire array if didn't specify a key.
+	if ( ! $key ) {
+		return $dataset;
+	}
+
+	// Now return the single requested key.
+	return isset( $dataset[ $key ] ) ? $dataset[ $key ] : false;
+}
+
+/**
+ * Remove individual relationships by ID.
+ *
+ * @param  array  $ids  The relationship IDs.
+ *
+ * @return mixed
+ */
+function remove_single_relationships( $ids = array() ) {
+
+	// If we don't have ID, bail.
+	if ( ! $ids ) {
+		return false;
+	}
+
+	// Now loop my IDs and delete one by one.
+	foreach ( (array) $ids as $id ) {
+
+		// Run the delete process.
+		$delete = Database\delete_by_relationship( $id );
+	}
+
+	// A basic thing for now.
+	return true;
 }
