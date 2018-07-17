@@ -1,5 +1,5 @@
 
-.wc-product-interest-account-notice {
+.woo-product-interest-account-notice {
 
 	clear: both;
 	width: 100%;
@@ -19,7 +19,7 @@
 		color: #222;
 	}
 
-	.wc-product-interest-account-notice-dismiss {
+	.woo-product-interest-account-notice-dismiss {
 		position: absolute;
 		right: 7px;
 		top: 7px;
@@ -28,32 +28,32 @@
 		line-height: 20px;
 	}
 
-	&.wc-product-interest-account-notice-success {
+	&.woo-product-interest-account-notice-success {
 		border-color: #4f8a10;
 		background-color: rgb(79, 138, 16);
 		background-color: rgba(79, 138, 16, 0.2);
 
-		.wc-product-interest-account-notice-dismiss {
+		.woo-product-interest-account-notice-dismiss {
 			color: #4f8a10;
 		}
 	}
 
-	&.wc-product-interest-account-notice-warning {
+	&.woo-product-interest-account-notice-warning {
 		border-color: #e5822b;
 		background-color: rgb(229, 130, 43);
 		background-color: rgba(229, 130, 43, 0.2);
 
-		.wc-product-interest-account-notice-dismiss {
+		.woo-product-interest-account-notice-dismiss {
 			color: #e5822b;
 		}
 	}
 
-	&.wc-product-interest-account-notice-error {
+	&.woo-product-interest-account-notice-error {
 		border-color: #bc2f25;
 		background-color: rgb(188, 47, 37);
 		background-color: rgba(188, 47, 37, 0.2);
 
-		.wc-product-interest-account-notice-dismiss {
+		.woo-product-interest-account-notice-dismiss {
 			color: #bc2f25;
 		}
 	}

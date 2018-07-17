@@ -19,4 +19,46 @@ ul .woocommerce-MyAccount-navigation-link.woocommerce-MyAccount-navigation-link-
 .woo-interest-in-products-change-submit {
   margin-bottom: 0; }
 
+.woo-product-interest-account-notice {
+  clear: both;
+  width: 100%;
+  display: block;
+  border: 1px solid #778899;
+  border-radius: 3px;
+  background-color: #fff;
+  padding: 7px;
+  margin: 0 auto 20px;
+  position: relative; }
+  .woo-product-interest-account-notice p {
+    font-size: 15px;
+    line-height: 20px;
+    text-align: center;
+    margin: 0;
+    color: #222; }
+  .woo-product-interest-account-notice .woo-product-interest-account-notice-dismiss {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px; }
+  .woo-product-interest-account-notice.woo-product-interest-account-notice-success {
+    border-color: #4f8a10;
+    background-color: #4f8a10;
+    background-color: rgba(79, 138, 16, 0.2); }
+    .woo-product-interest-account-notice.woo-product-interest-account-notice-success .woo-product-interest-account-notice-dismiss {
+      color: #4f8a10; }
+  .woo-product-interest-account-notice.woo-product-interest-account-notice-warning {
+    border-color: #e5822b;
+    background-color: #e5822b;
+    background-color: rgba(229, 130, 43, 0.2); }
+    .woo-product-interest-account-notice.woo-product-interest-account-notice-warning .woo-product-interest-account-notice-dismiss {
+      color: #e5822b; }
+  .woo-product-interest-account-notice.woo-product-interest-account-notice-error {
+    border-color: #bc2f25;
+    background-color: #bc2f25;
+    background-color: rgba(188, 47, 37, 0.2); }
+    .woo-product-interest-account-notice.woo-product-interest-account-notice-error .woo-product-interest-account-notice-dismiss {
+      color: #bc2f25; }
+
 /*# sourceMappingURL=woo-interest-in-products-front.css.map */

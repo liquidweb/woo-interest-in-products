@@ -17,9 +17,40 @@ use LiquidWeb\WooInterestInProducts\Queries as Queries;
 /**
  * Start our engines.
  */
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\load_post_meta_assets' );
 add_action( 'add_meta_boxes_product', __NAMESPACE__ . '\load_subscribed_customers_metabox', 11 );
 add_action( 'woocommerce_product_options_advanced', __NAMESPACE__ . '\display_product_subscribe_checkbox' );
 add_action( 'woocommerce_process_product_meta', __NAMESPACE__ . '\save_product_subscribe' );
+
+/**
+ * Load our admin side post editor JS and CSS.
+ *
+ * @param $hook  Admin page hook we are current on.
+ *
+ * @return void
+ */
+function load_post_meta_assets( $hook ) {
+
+	// Run the check for being on the post editor on products.
+	$is_editor  = Helpers\check_admin_screen( 'post_type', 'product' );
+
+	// Bail if we aren't there.
+	if ( ! $is_editor ) {
+		return;
+	}
+
+	// Set my handle.
+	$handle = 'woo-interest-in-products-editor';
+
+	// Set a file suffix structure based on whether or not we want a minified version.
+	$file   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? $handle : $handle . '.min';
+
+	// Set a version for whether or not we're debugging.
+	$vers   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : Core\VERS;
+
+	// Load our CSS file.
+	wp_enqueue_style( $handle, Core\ASSETS_URL . '/css/' . $file . '.css', false, $vers, 'all' );
+}
 
 /**
  * Display a metabox with all the subscribed users.
@@ -61,11 +92,8 @@ function display_interested_customers( $post ) {
 		return;
 	}
 
-	// Clean up the list we wanna pass.
-	$customers  = wp_list_pluck( $customers, 'customer_id' );
-
 	// We have customers, so lets set up a list.
-	Layout\get_subscribed_customers_list( $customers, true );
+	Layout\get_subscribed_customers_admin_list( $customers, true );
 }
 
 /**

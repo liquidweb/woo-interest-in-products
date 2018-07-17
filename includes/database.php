@@ -12,6 +12,7 @@ namespace LiquidWeb\WooInterestInProducts\Database;
 use LiquidWeb\WooInterestInProducts as Core;
 use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
 
+// Bring in the other namespaced items.
 use WP_Error;
 
 /**

@@ -74,6 +74,7 @@ require_once __DIR__ . '/includes/layout.php';
 require_once __DIR__ . '/includes/queries.php';
 require_once __DIR__ . '/includes/post-meta.php';
 require_once __DIR__ . '/includes/account.php';
+require_once __DIR__ . '/includes/ajax-actions.php';
 require_once __DIR__ . '/includes/checkout.php';
 require_once __DIR__ . '/includes/export.php';
 require_once __DIR__ . '/includes/table-views.php';

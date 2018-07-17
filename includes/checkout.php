@@ -146,7 +146,7 @@ function validate_product_interest_data( $data, $errors ) {
 }
 
 /**
- * Update the opt-in field choices for the customer.
+ * Update the product interest field choices for the customer.
  *
  * @param  integer $customer_id  The WooCommerce customer ID.
  * @param  array   $data         The post data from the order.
@@ -164,6 +164,9 @@ function update_customer_product_interest( $customer_id, $data ) {
 	if ( empty( $customer_id ) || empty( $data ) || ! is_array( $data ) ) {
 		return;
 	}
+
+	// Include an action for before the signup.
+	do_action( Core\HOOK_PREFIX . 'before_signup', $customer_id, $data );
 
 	// If we don't have any products, just bail.
 	if ( empty( $data['product-interest'] ) ) {
@@ -186,6 +189,8 @@ function update_customer_product_interest( $customer_id, $data ) {
 
 	}
 
+	// Include an action for after the interest is processed.
+	do_action( Core\HOOK_PREFIX . 'after_signup', $setup, $customer_id, $data );
 	// @@todo  handle error / empty return?
 }
 

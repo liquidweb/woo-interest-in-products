@@ -11,6 +11,10 @@ namespace LiquidWeb\WooInterestInProducts\Queries;
 // Set our aliases.
 use LiquidWeb\WooInterestInProducts as Core;
 use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
+use LiquidWeb\WooInterestInProducts\Database as Database;
+
+// Bring in the other namespaced items.
+use WP_Error;
 
 /**
  * Get all the product IDs that have the signup enabled.
@@ -70,12 +74,12 @@ function get_enabled_products( $flush = false ) {
 /**
  * Get an array of all the customer IDs subscribed to something.
  *
- * @param  string  $return  Return just the IDs or the whole user object.
+ * @param  string  $return  Return just the IDs or the whole data set.
  * @param  boolean $flush   Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_all_customers( $flush = false ) {
+function get_all_customers( $return = 'data', $flush = false ) {
 
 	// Set my transient key.
 	$ky = 'woo_product_interest_customers_all';
@@ -96,13 +100,13 @@ function get_all_customers( $flush = false ) {
 
 		// Set up our query.
 		$setup  = $wpdb->prepare("
-			SELECT   customer_id
+			SELECT   *
 			FROM     $table
 			ORDER BY '%s' ASC
 		", esc_attr( 'signup_date' ) );
 
 		// Process the query.
-		$query  = $wpdb->get_col( $setup );
+		$query  = $wpdb->get_results( $setup );
 
 		// If we came back empty, check for an error return.
 		if ( ! $query ) {
@@ -115,28 +119,35 @@ function get_all_customers( $flush = false ) {
 			}
 		}
 
-		// Make sure they're unique.
-		$customers  = array_unique( $query );
+		// Pull out the IDs and signup dates.
+		$customer_ids   = wp_list_pluck( $query, 'signup_date', 'customer_id' );
 
 		// Set my empty array.
 		$customer_data  = array();
 
 		// Now loop and set the data for each user.
-		foreach ( $customers as $customer_id ) {
+		foreach ( $customer_ids as $customer_id => $signup_date ) {
 
 			// Get our initial user object.
 			$user   = get_userdata( absint( $customer_id ) );
 
-			// Get the customer data, the user object.
-			$customer_data[ $customer_id ] = (array) $user->data;
+			// Set the user object as part of the array.
+			$setup  = (array) $user->data;
+
+			// Include the user edit link and signup date.
+			$setup['user_edit_link'] = get_edit_user_link( $customer_id );
+			$setup['signup_date']    = esc_attr( $signup_date );
+
+			// Now add the new data array into the larger one.
+			$customer_data[ $customer_id ] = $setup;
 		}
 
 		// Set our transient with our data.
 		set_transient( $ky, $customer_data, HOUR_IN_SECONDS );
 	}
 
-	// Return the array of data, filtering out the duplicates.
-	return $customer_data;
+	// Return the array of user IDs, filtering out the duplicates.
+	return 'ids' === sanitize_text_field( $return ) ? array_keys( $customer_data ) : $customer_data;
 }
 
 /**
@@ -169,7 +180,7 @@ function get_customers_for_product( $product_id = 0, $return = 'data', $flush = 
 	}
 
 	// Check the transient.
-	if ( false === $customers = get_transient( $ky )  ) {
+	if ( false === $customer_data = get_transient( $ky )  ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -186,7 +197,7 @@ function get_customers_for_product( $product_id = 0, $return = 'data', $flush = 
 		", absint( $product_id ) );
 
 		// Process the query.
-		$query  = $wpdb->get_results( $setup, ARRAY_A );
+		$query  = $wpdb->get_results( $setup );
 
 		// If we came back empty, check for an error return.
 		if ( ! $query ) {
@@ -199,27 +210,47 @@ function get_customers_for_product( $product_id = 0, $return = 'data', $flush = 
 			}
 		}
 
-		// Make sure they're unique.
-		$customers  = Helpers\sanitize_text_recursive( $query );
+		// Pull out the IDs and signup dates.
+		$customer_ids   = wp_list_pluck( $query, 'signup_date', 'customer_id' );
+
+		// Set my empty array.
+		$customer_data  = array();
+
+		// Now loop and set the data for each user.
+		foreach ( $customer_ids as $customer_id => $signup_date ) {
+
+			// Get our initial user object.
+			$user   = get_userdata( absint( $customer_id ) );
+
+			// Set the user object as part of the array.
+			$setup  = (array) $user->data;
+
+			// Include the user edit link and signup date.
+			$setup['user_edit_link'] = get_edit_user_link( $customer_id );
+			$setup['signup_date']    = esc_attr( $signup_date );
+
+			// Now add the new data array into the larger one.
+			$customer_data[ $customer_id ] = $setup;
+		}
 
 		// Set our transient with our data.
-		set_transient( $ky, $customers, HOUR_IN_SECONDS );
+		set_transient( $ky, $customer_data, HOUR_IN_SECONDS );
 	}
 
 	// Return the array of user IDs, filtering out the duplicates.
-	return 'ids' === sanitize_text_field( $return ) ? wp_list_pluck( $customers, 'customer_id' ) : $customers;
+	return 'ids' === sanitize_text_field( $return ) ? array_keys( $customer_data ) : $customer_data;
 }
 
 /**
  * Get the products that have subscribed by a customer.
  *
  * @param  integer $customer_id  The user ID to look up.
- * @param  string  $return       Whether to return the actual data or just the IDs.
+ * @param  string  $column       Whether to return the actual data or just the IDs.
  * @param  boolean $flush        Whether to flush the cache first or not.
  *
  * @return array
  */
-function get_products_for_customer( $customer_id = 0, $return = 'data', $flush = false ) {
+function get_products_for_customer( $customer_id = 0, $column = false, $flush = false ) {
 
 	// Make sure we have a user ID.
 	if ( empty( $customer_id ) ) {
@@ -272,8 +303,13 @@ function get_products_for_customer( $customer_id = 0, $return = 'data', $flush =
 		set_transient( $ky, $products, HOUR_IN_SECONDS );
 	}
 
-	// Return the array of product data, filtering out the duplicates.
-	return 'ids' === sanitize_text_field( $return ) ? wp_list_pluck( $products, 'product_id' ) : $products;
+	// Return the whole thing if requested.
+	if ( ! $column ) {
+		return $products;
+	}
+
+	// Return the plucked if we have that column.
+	return in_array( $column, array( 'relationship_id', 'product_id', 'customer_id', 'signup_date' ) ) ? wp_list_pluck( $products, $column ) : false;
 }
 
 /**
@@ -399,6 +435,11 @@ function get_all_subscription_data( $return = 'data' ) {
 	// Make sure all the relationship IDs are valid.
 	$relationship_ids   = array_map( 'absint', $query );
 
+	// If we want the counts, return that.
+	if ( 'counts' === sanitize_text_field( $return ) ) {
+		return count( $relationship_ids );
+	}
+
 	// If we don't want data, just return the IDs.
 	if ( 'ids' === sanitize_text_field( $return ) ) {
 		return $relationship_ids;
@@ -414,4 +455,27 @@ function get_all_subscription_data( $return = 'data' ) {
 
 	// Return the relationship data.
 	return $relationships;
+}
+
+/**
+ * Remove individual relationships by ID.
+ *
+ * @param  array  $ids  The relationship IDs.
+ *
+ * @return mixed
+ */
+function remove_single_relationships( $ids = array() ) {
+
+	// If we don't have ID, bail.
+	if ( ! $ids ) {
+		return false;
+	}
+
+	// Now loop my IDs and delete one by one.
+	foreach ( (array) $ids as $id ) {
+		$delete = Database\delete_by_relationship( $id );
+	}
+
+	// A basic thing for now.
+	return true;
 }

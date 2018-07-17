@@ -757,7 +757,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 				'customer_edit'   => get_edit_user_link( absint( $relationship_data['product_id'] ), 'raw' ),
 				'customer_email'  => esc_attr( $relationship_data['customer']['user_email'] ),
 				'customer_orders' => add_query_arg( $order_args, admin_url( 'edit.php' ) ),
-				'signup_date'     => esc_attr( $relationship_data['signup'] ),
+				'signup_date'     => esc_attr( $relationship_data['signup_date'] ),
 			);
 
 			// Run it through a filter.

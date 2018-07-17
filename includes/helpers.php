@@ -13,6 +13,78 @@ use LiquidWeb\WooInterestInProducts as Core;
 use LiquidWeb\WooInterestInProducts\Database as Database;
 
 /**
+ * Check an code and (usually an error) return the appropriate text.
+ *
+ * @param  string $code  The code provided.
+ *
+ * @return string
+ */
+function notice_text( $code = '' ) {
+
+	// Handle my different error codes.
+	switch ( esc_attr( strtolower( $code ) ) ) {
+
+		case 'success-change-interests' :
+			$msgtxt = __( 'Your interest selections have been updated.', 'woo-interest-in-products' );
+			break;
+
+		case 'success-general' :
+		case 'success' :
+			$msgtxt = __( 'Success! Your request has been completed.', 'woo-interest-in-products' );
+			break;
+
+		case 'update-error' :
+			$msgtxt = __( 'Your settings could not be updated.', 'woo-interest-in-products' );
+			break;
+
+		case 'missing-nonce' :
+			$msgtxt = __( 'The required nonce was missing.', 'woo-interest-in-products' );
+			break;
+
+		case 'bad-nonce' :
+			$msgtxt = __( 'The required nonce was invalid.', 'woo-interest-in-products' );
+			break;
+
+		case 'invalid-nonce' :
+			$msgtxt = __( 'The required nonce was missing or invalid.', 'woo-interest-in-products' );
+			break;
+
+		case 'missing-customer-id' :
+			$msgtxt = __( 'The required customer ID was not provided.', 'woo-interest-in-products' );
+			break;
+
+		case 'no-customer' :
+			$msgtxt = __( 'The current customer could not be determined.', 'woo-interest-in-products' );
+			break;
+
+		case 'no-original-ids' :
+			$msgtxt = __( 'No existing product signups were found.', 'woo-interest-in-products' );
+			break;
+
+		case 'customer-update-failed' :
+			$msgtxt = __( 'Your interest selections could not be updated.', 'woo-interest-in-products' );
+			break;
+
+		case 'missing-required-field' :
+			$msgtxt = __( 'Please review all the required fields.', 'woo-interest-in-products' );
+			break;
+
+		case 'unknown' :
+		case 'unknown-error' :
+			$msgtxt = __( 'There was an unknown error with your request.', 'woo-interest-in-products' );
+			break;
+
+		default :
+			$msgtxt = __( 'There was an error with your request.', 'woo-interest-in-products' );
+
+		// End all case breaks.
+	}
+
+	// Return it with a filter.
+	return apply_filters( Core\HOOK_PREFIX . 'notice_text', $msgtxt, $code );
+}
+
+/**
  * Check a product ID to see if it enabled.
  *
  * @param  integer $product_id  The ID of the product.
@@ -93,8 +165,11 @@ function account_page_redirect( $args = array() ) {
 		return;
 	}
 
+	// Set the link.
+	$setup  = get_account_tab_link( $args );
+
 	// Do the redirect.
-	wp_redirect( get_account_tab_link( $args ) );
+	wp_redirect( $setup );
 	exit;
 }
 
@@ -237,6 +312,128 @@ function maybe_admin_settings_page( $hook = '' ) {
 }
 
 /**
+ * Check our various constants on an Ajax call.
+ *
+ * @return boolean
+ */
+function check_ajax_constants() {
+
+	// Check for a REST API request.
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		return false;
+	}
+
+	// Check for running an autosave.
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return false;
+	}
+
+	// Check for running a cron, unless we've skipped that.
+	if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+		return false;
+	}
+
+	// We hit none of the checks, so proceed.
+	return true;
+}
+
+/**
+ * Do the whole 'check current screen' progressions.
+ *
+ * @param  string $check    The type of comparison we want to do.
+ * @param  string $compare  What we want to compare against on the screen.
+ * @param  string $action   If we want to return the value or compare it against something.
+ *
+ * @return boolean          Whether or not we are.
+ */
+function check_admin_screen( $check = 'post_type', $compare = '', $action = 'compare' ) {
+
+	// Bail if not on admin or our function doesnt exist.
+	if ( ! is_admin() || ! function_exists( 'get_current_screen' ) ) {
+		return false;
+	}
+
+	// Get my current screen.
+	$screen = get_current_screen();
+
+	// Bail without.
+	if ( empty( $screen ) || ! is_object( $screen ) ) {
+		return false;
+	}
+
+	// If the check is false, return the entire screen object.
+	if ( empty( $check ) || ! empty( $action ) && 'object' === sanitize_key( $action ) ) {
+		return $screen;
+	}
+
+	// Do the post type check.
+	if ( 'post_type' === $check ) {
+
+		// If we have no post type, it's false right off the bat.
+		if ( empty( $screen->post_type ) ) {
+			return false;
+		}
+
+		// Handle my different action types.
+		switch ( $action ) {
+
+			case 'compare' :
+				return ! empty( $compare ) && sanitize_key( $compare ) === $screen->post_type ? true : false;
+				break;
+
+			case 'return' :
+				return $screen->post_type;
+				break;
+		}
+	}
+
+	// Do the base check.
+	if ( 'base' === $check ) {
+
+		// If we have no base, it's false right off the bat.
+		if ( empty( $screen->base ) ) {
+			return false;
+		}
+
+		// Handle my different action types.
+		switch ( $action ) {
+
+			case 'compare' :
+				return ! empty( $compare ) && sanitize_key( $compare ) === $screen->base ? true : false;
+				break;
+
+			case 'return' :
+				return $screen->base;
+				break;
+		}
+	}
+
+	// Do the ID check.
+	if ( in_array( $check, array( 'id', 'ID' ) ) ) {
+
+		// If we have no ID, it's false right off the bat.
+		if ( empty( $screen->id ) ) {
+			return false;
+		}
+
+		// Handle my different action types.
+		switch ( $action ) {
+
+			case 'compare' :
+				return ! empty( $compare ) && sanitize_key( $compare ) === $screen->id ? true : false;
+				break;
+
+			case 'return' :
+				return $screen->id;
+				break;
+		}
+	}
+
+	// Nothing left. bail.
+	return false;
+}
+
+/**
  * Set up a recursive callback for multi-dimensional text arrays.
  *
  * @param  array   $input   The data array.
@@ -354,26 +551,23 @@ function build_date_display( $date = '', $key = '', $format = '' ) {
 }
 
 /**
- * Remove individual relationships by ID.
+ * Compare two arrays to see if they are identical.
  *
- * @param  array  $ids  The relationship IDs.
+ * @param  array $source  The source array.
+ * @param  array $update  The second array to compare to.
  *
- * @return mixed
+ * @return boolean
  */
-function remove_single_relationships( $ids = array() ) {
+function compare_id_arrays( $source, $update ) {
 
-	// If we don't have ID, bail.
-	if ( ! $ids ) {
-		return false;
-	}
+	// First make sure both are set with integers.
+	$source = array_map( 'absint', $source );
+	$update = array_map( 'absint', $update );
 
-	// Now loop my IDs and delete one by one.
-	foreach ( (array) $ids as $id ) {
+	// First run our sorts.
+	sort( $source );
+	sort( $update );
 
-		// Run the delete process.
-		$delete = Database\delete_by_relationship( $id );
-	}
-
-	// A basic thing for now.
-	return true;
+	// Run our comparison.
+	return $source === $update;
 }
