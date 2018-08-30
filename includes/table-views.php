@@ -465,7 +465,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		}
 
 		// Add our option key to get later.
-		update_option( 'wc_product_interest_export_ids', $relationship_ids, 'no' );
+		update_option( Core\OPTION_PREFIX . 'export_ids', $relationship_ids, 'no' );
 
 		// Set the nonce for the export.
 		$nonce  = wp_create_nonce( 'wc_product_interest_export' );

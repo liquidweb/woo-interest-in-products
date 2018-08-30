@@ -15,6 +15,7 @@ use LiquidWeb\WooInterestInProducts as Core;
  * Start our engines.
  */
 add_action( 'init', __NAMESPACE__ . '\add_account_rewrite_endpoint' );
+add_filter( 'removable_query_args', __NAMESPACE__ . '\add_removable_arg' );
 add_filter( 'query_vars', __NAMESPACE__ . '\add_account_endpoint_vars', 0 );
 
 /**
@@ -24,6 +25,19 @@ add_filter( 'query_vars', __NAMESPACE__ . '\add_account_endpoint_vars', 0 );
  */
 function add_account_rewrite_endpoint() {
 	add_rewrite_endpoint( Core\FRONT_VAR, EP_ROOT | EP_PAGES );
+}
+
+/**
+ * Add our custom strings to the vars.
+ *
+ * @param  array $args  The existing array of args.
+ *
+ * @return array $args  The modified array of args.
+ */
+function add_removable_arg( $args ) {
+
+    // Include my new args and return.
+	return wp_parse_args( array( 'prod-interest-enable-all', 'prod-interest-enable-result' ), $args );
 }
 
 /**

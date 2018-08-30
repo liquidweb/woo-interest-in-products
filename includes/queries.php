@@ -19,6 +19,45 @@ use WP_Error;
 /**
  * Get all the product IDs that have the signup enabled.
  *
+ * @return array
+ */
+function get_all_products( $flush = false ) {
+
+	// Call the global database.
+	global $wpdb;
+
+	// Set up our query.
+	$setup  = $wpdb->prepare("
+		SELECT   ID
+		FROM     $wpdb->posts
+		WHERE    post_type = '%s'
+		AND      post_status = '%s'
+	", esc_sql( 'product' ), esc_sql( 'publish' ) );
+
+	// Process the query.
+	$query  = $wpdb->get_col( $setup );
+
+	// If the query didn't work, handle it.
+	if ( ! $query ) {
+
+		// Return the WP_Error item if we have it, otherwise a generic false.
+		if ( $wpdb->last_error ) {
+			return new WP_Error( 'db_query_error', __( 'Could not execute query', 'woo-interest-in-products' ), $wpdb->last_error );
+		} else {
+			return false;
+		}
+	}
+
+	// Make sure they're unique.
+	$items  = array_unique( $query );
+
+	// Return the array of product IDs, filtering out the duplicates.
+	return $items;
+}
+
+/**
+ * Get all the product IDs that have the signup enabled.
+ *
  * @param  boolean $flush  Whether to flush the cache first or not.
  *
  * @return array

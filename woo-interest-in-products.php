@@ -53,6 +53,9 @@ define( __NAMESPACE__ . '\TABLE_NAME', 'wc_product_interest' );
 // Set the prefix for our actions and filters.
 define( __NAMESPACE__ . '\HOOK_PREFIX', 'woo_products_interest_' );
 
+// Set the prefix for our stored options.
+define( __NAMESPACE__ . '\OPTION_PREFIX', 'wc_product_interest_' );
+
 // Set the option key used to store the schema.
 define( __NAMESPACE__ . '\SCHEMA_KEY', HOOK_PREFIX . 'db_version' );
 
@@ -78,6 +81,7 @@ require_once __DIR__ . '/includes/ajax-actions.php';
 require_once __DIR__ . '/includes/checkout.php';
 require_once __DIR__ . '/includes/export.php';
 require_once __DIR__ . '/includes/table-views.php';
+require_once __DIR__ . '/includes/admin.php';
 require_once __DIR__ . '/includes/settings-tab.php';
 
 

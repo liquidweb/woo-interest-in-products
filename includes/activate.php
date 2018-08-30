@@ -22,6 +22,9 @@ function activate() {
 	// Run the check on the DB table.
 	Database\maybe_install_table();
 
+	// Set the flag to prompt site owner to enable all products.
+	update_option( Core\OPTION_PREFIX . 'enable_all_prompt', 1, 'no' );
+
 	// Include our action so that we may add to this later.
 	do_action( Core\HOOK_PREFIX . 'activate_process' );
 
