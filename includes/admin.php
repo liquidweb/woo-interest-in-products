@@ -16,34 +16,9 @@ use LiquidWeb\WooInterestInProducts\Queries as Queries;
 /**
  * Start our engines.
  */
-add_action( 'admin_init', __NAMESPACE__ . '\activation_prompt_request' );
 add_action( 'admin_notices', __NAMESPACE__ . '\activation_prompt_notice' );
 add_action( 'admin_notices', __NAMESPACE__ . '\activation_prompt_results' );
-
-/**
- * Check for the request to enable all the products.
- *
- * @return void
- */
-function activation_prompt_request() {
-
-	// Check for the query string before proceeding.
-	if ( empty( $_GET['prod-interest-enable-all'] ) ) {
-		return;
-	}
-
-	// Handle my different action types.
-	switch ( sanitize_text_field( $_GET['prod-interest-enable-all'] ) ) {
-
-		case 'yes' :
-			activation_prompt_enable();
-			break;
-
-		case 'no' :
-			activation_prompt_dismiss();
-			break;
-	}
-}
+add_action( 'admin_init', __NAMESPACE__ . '\activation_prompt_request' );
 
 /**
  * Check for the prompt key to enable all items.
@@ -124,6 +99,31 @@ function activation_prompt_results() {
 
 	// Echo it.
 	echo $field; // WPCS: XSS ok.
+}
+
+/**
+ * Check for the request to enable all the products.
+ *
+ * @return void
+ */
+function activation_prompt_request() {
+
+	// Check for the query string before proceeding.
+	if ( empty( $_GET['prod-interest-enable-all'] ) ) {
+		return;
+	}
+
+	// Handle my different action types.
+	switch ( sanitize_text_field( $_GET['prod-interest-enable-all'] ) ) {
+
+		case 'yes' :
+			activation_prompt_enable();
+			break;
+
+		case 'no' :
+			activation_prompt_dismiss();
+			break;
+	}
 }
 
 /**
