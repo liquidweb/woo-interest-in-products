@@ -277,7 +277,7 @@ function get_single_customer_signups( $dataset = array(), $customer_id = 0, $ech
 	$build .= '<div class="woo-interest-in-products-change-form-wrapper">';
 
 		// Describe what to do.
-		$build .= '<p class="woo-interest-in-products-subtitle">' . esc_html__( 'Below are the products you requested to stay informed about. You can review and update them at any time.', 'woo-interest-in-products' ) . '</p>';
+		$build .= '<p class="woo-interest-in-products-subtitle">' . esc_html__( 'Below are the products you requested to stay informed about. You can review and update your subscriptions at any time.', 'woo-interest-in-products' ) . '</p>';
 
 		// Set the form.
 		$build .= '<form class="woo-interest-in-products-change-form" action="' . esc_url( $flink ) . '" method="post">';

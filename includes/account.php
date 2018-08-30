@@ -90,8 +90,11 @@ function check_user_product_interest_changes() {
 		redirect_account_page_action( 'missing-customer-id' );
 	}
 
+	// Set my customer ID.
+	$customer_id    = absint( $_POST['wc_product_interest_customer_id'] );
+
 	// Determine my original IDs.
-	$original_ids   = ! empty( $_POST['wc_product_interest_original_ids'] ) ? explode( ',', sanitize_text_field( $_POST['wc_product_interest_original_ids'] ) ) : Queries\get_products_for_customer( absint( $_POST['wc_product_interest_customer_id'] ), 'relationship_id' );
+	$original_ids   = ! empty( $_POST['wc_product_interest_original_ids'] ) ? explode( ',', sanitize_text_field( $_POST['wc_product_interest_original_ids'] ) ) : Queries\get_products_for_customer( $customer_id, 'relationship_id' );
 
 	// Check for the original IDs to exist.
 	if ( empty( $original_ids ) ) {
@@ -102,7 +105,7 @@ function check_user_product_interest_changes() {
 	if ( ! isset( $_POST['wc_product_interest_ids'] ) ) {
 
 		// Remove everything.
-		Queries\remove_single_relationships( $original_ids );
+		Queries\remove_single_relationships( $original_ids, $customer_id );
 
 		// And redirect.
 		redirect_account_page_action( 'success-change-interests', 1 );
@@ -130,7 +133,7 @@ function check_user_product_interest_changes() {
 		}
 
 		// Didn't find it, so we remove it.
-		Queries\remove_single_relationships( $original_id );
+		Queries\remove_single_relationships( $original_id, $customer_id );
 	}
 
 	// And redirect.

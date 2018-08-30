@@ -460,21 +460,34 @@ function get_all_subscription_data( $return = 'data' ) {
 /**
  * Remove individual relationships by ID.
  *
- * @param  array  $ids  The relationship IDs.
+ * @param  array   $relationships  The relationship IDs.
+ * @param  integer $customer_id    The customer ID tied to the request.
  *
  * @return mixed
  */
-function remove_single_relationships( $ids = array() ) {
+function remove_single_relationships( $relationships = array(), $customer_id = 0 ) {
 
-	// If we don't have ID, bail.
-	if ( ! $ids ) {
+	// If we don't have relationships IDs, bail.
+	if ( ! $relationships ) {
 		return false;
 	}
 
-	// Now loop my IDs and delete one by one.
-	foreach ( (array) $ids as $id ) {
-		$delete = Database\delete_by_relationship( $id );
+	// Now loop my relationships IDs and delete one by one.
+	foreach ( (array) $relationships as $relationship_id ) {
+
+		// Fire the action before an ID is deleted.
+		do_action( Core\HOOK_PREFIX . 'delete_by_relationship_before', $relationship_id, $customer_id );
+
+		// And delete the item.
+		$delete = Database\delete_by_relationship( $relationship_id );
+
+		// Fire the action after an ID is deleted.
+		do_action( Core\HOOK_PREFIX . 'delete_by_relationship_after', $relationship_id, $customer_id );
 	}
+
+	// Now delete the transient tied to the customer and the all list.
+	delete_transient( 'woo_customer_interest_products_' . absint( $customer_id ) );
+	delete_transient( 'woo_product_interest_customers_all' );
 
 	// A basic thing for now.
 	return true;

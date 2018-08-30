@@ -271,7 +271,6 @@ function delete_by_relationship( $relationship_id = 0 ) {
 	// Run my delete function.
 	$delete = $wpdb->delete( $wpdb->wc_product_interest, array( 'relationship_id' => absint( $relationship_id ) ) );
 
-	// Delete the relevant transients.
-	delete_transient( 'woo_product_interest_customers_all' );
+	// Delete the transient tied to the relationship.
 	delete_transient( 'woo_customer_relationship_data_' . absint( $relationship_id ) );
 }
