@@ -314,9 +314,16 @@ function maybe_admin_settings_page( $hook = '' ) {
 /**
  * Check our various constants on an Ajax call.
  *
+ * @param  boolean $check_admin  Check if the call is being made on admin side.
+ *
  * @return boolean
  */
-function check_ajax_constants() {
+function check_ajax_constants( $check_admin = false ) {
+
+	// Run the admin check if requested.
+	if ( $check_admin && ! is_admin() ) {
+		return false;
+	}
 
 	// Check for a REST API request.
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
