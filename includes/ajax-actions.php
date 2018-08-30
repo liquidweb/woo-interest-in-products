@@ -61,7 +61,7 @@ function save_customer_product_interest() {
 	if ( ! isset( $_POST['interest_ids'] ) ) {
 
 		// Remove everything.
-		Queries\remove_single_relationships( $original_ids );
+		Queries\remove_single_relationships( $original_ids, $customer_id );
 
 		// Send the success.
 		send_ajax_success_response( false );
@@ -92,7 +92,7 @@ function save_customer_product_interest() {
 		}
 
 		// Didn't find it, so we remove it.
-		Queries\remove_single_relationships( $original_id );
+		Queries\remove_single_relationships( $original_id, $customer_id );
 	}
 
 	// Generate the markup.
