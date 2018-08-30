@@ -17,14 +17,14 @@ use LiquidWeb\WooInterestInProducts\Layout as Layout;
 /**
  * Start our engines.
  */
-add_action( 'wp_ajax_woo_save_customer_product_interest', __NAMESPACE__ . '\save_customer_product_interest' );
+add_action( 'wp_ajax_woo_update_customer_product_interest', __NAMESPACE__ . '\update_customer_product_interest' );
 
 /**
  * Update our user opt-in values.
  *
  * @return mixed
  */
-function save_customer_product_interest() {
+function update_customer_product_interest() {
 
 	// Check our various constants.
 	if ( ! Helpers\check_ajax_constants() ) {
@@ -32,7 +32,7 @@ function save_customer_product_interest() {
 	}
 
 	// Check for the specific action.
-	if ( empty( $_POST['action'] ) || 'woo_save_customer_product_interest' !== sanitize_text_field( $_POST['action'] ) ) { // WPCS: CSRF ok.
+	if ( empty( $_POST['action'] ) || 'woo_update_customer_product_interest' !== sanitize_text_field( $_POST['action'] ) ) { // WPCS: CSRF ok.
 		return;
 	}
 

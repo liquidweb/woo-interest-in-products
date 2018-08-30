@@ -43,7 +43,7 @@ jQuery( document ).ready( function($) {
 
 		// Build the data structure for the call.
 		var data = {
-			action: 'woo_save_customer_product_interest',
+			action: 'woo_update_customer_product_interest',
 			customer_id: document.getElementById( 'wc_product_interest_customer_id' ).value,
 			original_ids: document.getElementById( 'wc_product_interest_original_ids' ).value,
 			interest_ids: interestIDs,
