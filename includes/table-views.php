@@ -87,6 +87,11 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Make sure we have the bulk action running.
 		$this->process_bulk_action();
 
+		// Check for the _POST value to export.
+		if ( ! empty( $_POST['wc-product-interest-export-submit' ] ) && 'all' === sanitize_text_field( $_POST['wc-product-interest-export-submit' ] ) ) {
+			$this->process_export_submit();
+		}
+
 		// And the result.
 		$this->items = $dataset;
 	}
@@ -149,8 +154,13 @@ class ProductInterestSignups_Table extends WP_List_Table {
 			// Handle adding additional table nav actions.
 			do_action( Core\HOOK_PREFIX . 'extra_tablenav', '', $which );
 
-			// And handle our button.
+			// And handle our filter button.
 			echo '<button class="button action" name="wc-product-interest-filter-submit" type="submit" value="1">' . esc_html__( 'Filter', 'woo-interest-in-products' ) . '</button>';
+
+			// And handle our export button.
+			echo '<div class="wc-product-interest-tablenav-item wc-product-interest-export-submit-wrap">';
+				echo '<button class="button action" name="wc-product-interest-export-submit" type="submit" value="all">' . esc_html__( 'Export All Entries', 'woo-interest-in-products' ) . '</button>';
+			echo '</div>';
 
 		// Close the div.
 		echo '</div>';
@@ -180,7 +190,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		$build  = '';
 
 		// Wrap the product dropdown in a div.
-		$build .= '<div class="wc-product-interest-table-filter wc-product-interest-table-filter-products">';
+		$build .= '<div class="wc-product-interest-tablenav-item wc-product-interest-table-filter wc-product-interest-table-filter-products">';
 
 			// Handle our screen reader label.
 			$build .= '<label class="screen-reader-text" for="wc-product-interest-product-filter">' . esc_html__( 'Filter by product', 'woo-interest-in-products' ) . '</label>';
@@ -240,7 +250,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		$build  = '';
 
 		// Wrap the product dropdown in a div.
-		$build .= '<div class="wc-product-interest-table-filter wc-product-interest-table-filter-customers">';
+		$build .= '<div class="wc-product-interest-tablenav-item wc-product-interest-table-filter wc-product-interest-table-filter-customers">';
 
 			// Handle our screen reader label.
 			$build .= '<label class="screen-reader-text" for="wc-product-interest-customer-filter">' . esc_html__( 'Filter by customer', 'woo-interest-in-products' ) . '</label>';
@@ -376,6 +386,35 @@ class ProductInterestSignups_Table extends WP_List_Table {
 
 		// Got to the end? Why?
 		Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'unknown' ) );
+	}
+
+	/**
+	 * Handle the export from the button.
+	 *
+	 * @return void
+	 */
+	protected function process_export_submit() {
+
+		// Make sure we have the page we want.
+		if ( empty( $_GET['page'] ) || Core\MENU_SLUG !== sanitize_text_field( $_GET['page'] ) ) {
+			return;
+		}
+
+		// Fail on a missing or bad nonce.
+		if ( empty( $_POST['wc_product_interest_nonce_name'] ) || ! wp_verify_nonce( $_POST['wc_product_interest_nonce_name'], 'wc_product_interest_nonce_action' ) ) {
+			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
+		}
+
+		// Fetch our relationships.
+		$relationship_ids   = Queries\get_all_subscription_data( 'ids' );
+
+		// Check for the array of relationship IDs being passed.
+		if ( empty( $relationship_ids ) ) {
+			Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'no_ids' ) );
+		}
+
+		// Run the export bulk.
+		$this->process_bulk_export( $relationship_ids );
 	}
 
 	/**

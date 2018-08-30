@@ -12,9 +12,13 @@
 
 }
 
-
-.wc-product-interest-table-filter {
+.wc-product-interest-tablenav-item {
 	display: inline-block;
+	vertical-align: top;
+
+	&.wc-product-interest-export-submit-wrap {
+		margin-left: 30px;
+	}
 }
 
 .wc-product-interest-admin-table-display {
