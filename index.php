@@ -1,1 +1,1 @@
-<?php // Silence is golden. Duct tape is silver.
+<?php /** Silence is golden. Duct tape is silver.

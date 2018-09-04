@@ -73,7 +73,7 @@ function get_enabled_products( $flush = false ) {
 	}
 
 	// Check the transient.
-	if ( false === $items = get_transient( $ky )  ) {
+	if ( false === $items = get_transient( $ky ) ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -129,7 +129,7 @@ function get_all_customers( $return = 'data', $flush = false ) {
 	}
 
 	// Check the transient.
-	if ( false === $customer_data = get_transient( $ky )  ) {
+	if ( false === $customer_data = get_transient( $ky ) ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -219,7 +219,7 @@ function get_customers_for_product( $product_id = 0, $return = 'data', $flush = 
 	}
 
 	// Check the transient.
-	if ( false === $customer_data = get_transient( $ky )  ) {
+	if ( false === $customer_data = get_transient( $ky ) ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -305,7 +305,7 @@ function get_products_for_customer( $customer_id = 0, $column = false, $flush = 
 	}
 
 	// Check the transient.
-	if ( false === $products = get_transient( $ky )  ) {
+	if ( false === $products = get_transient( $ky ) ) {
 
 		// Call the global database.
 		global $wpdb;
@@ -374,7 +374,7 @@ function get_data_by_relationship( $relationship_id = 0 ) {
 	}
 
 	// Check the transient.
-	if ( false === $relationship = get_transient( $ky )  ) {
+	if ( false === $relationship = get_transient( $ky ) ) {
 
 		// Call the global database.
 		global $wpdb;

@@ -64,9 +64,11 @@ class Commands extends WP_CLI_Command {
 	function enable_all_products( $args = array(), $assoc_args = array() ) {
 
 		// Parse out the associatives.
-		$parsed = wp_parse_args( $assoc_args, array(
-			'active'    => true,
-		));
+		$parsed = wp_parse_args(
+			$assoc_args, array(
+				'active'    => true,
+			)
+		);
 
 		// Get my products.
 		$products   = WP_CLI::runcommand( 'post list --post_type=product --post_status=publish --field=ID --format=json', $this->get_command_args() );

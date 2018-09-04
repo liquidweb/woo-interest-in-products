@@ -10,7 +10,6 @@ namespace LiquidWeb\WooInterestInProducts\Admin;
 
 // Set our aliases.
 use LiquidWeb\WooInterestInProducts as Core;
-use LiquidWeb\WooInterestInProducts\Helpers as Helpers;
 use LiquidWeb\WooInterestInProducts\Queries as Queries;
 
 /**

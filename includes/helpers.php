@@ -10,7 +10,6 @@ namespace LiquidWeb\WooInterestInProducts\Helpers;
 
 // Set our aliases.
 use LiquidWeb\WooInterestInProducts as Core;
-use LiquidWeb\WooInterestInProducts\Database as Database;
 
 /**
  * Check an code and (usually an error) return the appropriate text.
@@ -77,7 +76,7 @@ function notice_text( $code = '' ) {
 		default :
 			$msgtxt = __( 'There was an error with your request.', 'woo-interest-in-products' );
 
-		// End all case breaks.
+			// End all case breaks.
 	}
 
 	// Return it with a filter.
@@ -252,11 +251,14 @@ function get_admin_menu_link() {
 	// Build out the link if we don't have our function.
 	if ( ! function_exists( 'menu_page_url' ) ) {
 
-		// Set my args.
-		$args   = array( 'post_type' => 'product', 'page' => $slug );
+		// Set up my args.
+		$setup  = array(
+			'post_type' => 'product',
+			'page'      => $slug,
+		);
 
 		// Return the link with our args.
-		return add_query_arg( $args, admin_url( 'edit.php' ) );
+		return add_query_arg( $setup, admin_url( 'edit.php' ) );
 	}
 
 	// Return using the function.
@@ -496,9 +498,9 @@ function clean_export( $string ) {
 			$string = 'FALSE';
 			break;
 
-		case preg_match( "/^0/", $string ):
-		case preg_match( "/^\+?\d{8,}$/", $string ):
-		case preg_match( "/^\d{4}.\d{1,2}.\d{1,2}/", $string ):
+		case preg_match( '/^0/', $string ):
+		case preg_match( '/^\+?\d{8,}$/', $string ):
+		case preg_match( '/^\d{4}.\d{1,2}.\d{1,2}/', $string ):
 			$string = "'$string";
 			break;
 
@@ -509,7 +511,7 @@ function clean_export( $string ) {
 		default:
 			$string = mb_convert_encoding( $string, 'UTF-16LE', 'UTF-8' );
 
-		// End all case breaks.
+			// End all case breaks.
 	}
 }
 

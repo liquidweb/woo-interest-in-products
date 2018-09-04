@@ -186,7 +186,7 @@ function update_customer_product_interest( $customer_id, $data ) {
 
 	// Handle our potential WP Error return.
 	if ( is_wp_error( $update ) ) {
-
+		return false; // @@todo  handle error / empty return?
 	}
 
 	// Include an action for after the interest is processed.

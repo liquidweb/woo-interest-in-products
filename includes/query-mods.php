@@ -36,8 +36,11 @@ function add_account_rewrite_endpoint() {
  */
 function add_removable_arg( $args ) {
 
-    // Include my new args and return.
-	return wp_parse_args( array( 'prod-interest-enable-all', 'prod-interest-enable-result' ), $args );
+	// Set the array of new args.
+	$setup  = apply_filters( Core\HOOK_PREFIX . 'removable_args', array( 'prod-interest-enable-all', 'prod-interest-enable-result' ) );
+
+	// Include my new args and return.
+	return ! empty( $setup ) ? wp_parse_args( $setup, $args ) : $args;
 }
 
 /**

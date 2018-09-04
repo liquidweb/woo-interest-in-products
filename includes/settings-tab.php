@@ -75,10 +75,10 @@ function settings_page_view() {
 	echo '<div class="wrap wc-product-interest-admin-wrap">';
 
 		// Handle the title.
-		echo '<h1 class="wc-product-interest-admin-title">' . get_admin_page_title() . '</h1>';
+		echo '<h1 class="wc-product-interest-admin-title">' . esc_html( get_admin_page_title() ) . '</h1>';
 
 		// Handle the table.
-		echo interest_list_table();
+		echo interest_list_table(); // WPCS: XSS ok.
 
 	// Close the entire thing.
 	echo '</div>';

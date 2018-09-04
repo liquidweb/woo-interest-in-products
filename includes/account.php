@@ -50,7 +50,8 @@ function load_endpoint_assets() {
 
 	// And our JS.
 	wp_enqueue_script( $handle, Core\ASSETS_URL . '/js/' . $file . '.js', array( 'jquery' ), $vers, true );
-	wp_localize_script( $handle, 'wooProductInterest',
+	wp_localize_script(
+		$handle, 'wooProductInterest',
 		array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) )
 	);
 
@@ -145,21 +146,26 @@ function check_user_product_interest_changes() {
  *
  * @param  string  $error_code  The error code we hit.
  * @param  integer $success     Whether the redirect is a success or not.
- * @param  array   $args        Optional args that can override it.
+ * @param  array   $custom      Optional args that can override it.
  *
  * @return void
  */
-function redirect_account_page_action( $error_code = '', $success = 0, $args = array() ) {
+function redirect_account_page_action( $error_code = '', $success = 0, $custom = array() ) {
 
-	// Set up our basic redirect args.
-	$basic  = array( 'success' => absint( $success ), 'woo-interest-in-products-action' => 1 );
-	$basic  = ! empty( $error_code ) ? wp_parse_args( $basic, array( 'errcode' => esc_attr( $error_code ) ) ) : $basic;
+	// Set our initial args we always have.
+	$basic  = array(
+		'success'                         => absint( $success ),
+		'woo-interest-in-products-action' => 1,
+	);
 
-	// Merge the args we have.
-	$setup  = ! empty( $args ) ? wp_parse_args( $args, $basic ) : $basic;
+	// Check for an error code being passed.
+	$setup  = ! empty( $error_code ) ? wp_parse_args( $basic, array( 'errcode' => esc_attr( $error_code ) ) ) : $basic;
+
+	// Merge the args we have with whatever was passed.
+	$merged = ! empty( $custom ) ? wp_parse_args( $custom, $setup ) : $setup;
 
 	// Redirect with our error code.
-	Helpers\account_page_redirect( $setup );
+	Helpers\account_page_redirect( $merged );
 }
 
 /**

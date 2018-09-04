@@ -97,7 +97,7 @@ function maybe_update_table() {
 function install_table() {
 
 	// Pull in the upgrade function.
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 	// Load the WPDB global.
 	global $wpdb;
@@ -168,7 +168,11 @@ function insert( $customer_id = 0, $products = array() ) {
 		}
 
 		// Set my insert data.
-		$insert = array( 'product_id' => $product_id, 'customer_id' => $customer_id, 'signup_date' => $signup );
+		$insert = array(
+			'product_id'  => $product_id,
+			'customer_id' => $customer_id,
+			'signup_date' => $signup,
+		);
 
 		// Filter our inserted data.
 		$insert = apply_filters( Core\HOOK_PREFIX . 'insert_data', $insert, $customer_id, $product_id );

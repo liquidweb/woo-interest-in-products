@@ -12,11 +12,10 @@ use LiquidWeb\WooInterestInProducts\Database as Database;
 use LiquidWeb\WooInterestInProducts\Queries as Queries;
 use LiquidWeb\WooInterestInProducts\DataExport as Export;
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-// WP_List_Table is not loaded automatically so we need to load it in our application
+// WP_List_Table is not loaded automatically so we need to load it in our application.
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -43,9 +42,9 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Prepare the items for the table to process
+	 * Prepare the items for the table to process.
 	 *
-	 * @return Void
+	 * @return void
 	 */
 	public function prepare_items() {
 
@@ -56,7 +55,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		$dataset    = $this->table_data();
 
 		// Check for the _POST value to filter.
-		if ( ! empty( $_POST['wc-product-interest-filter-submit' ] ) ) {
+		if ( ! empty( $_POST['wc-product-interest-filter-submit'] ) ) { // WPCS: CSRF ok.
 			$dataset    = $this->maybe_filter_dataset( $dataset );
 		}
 
@@ -78,7 +77,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Slice up our dataset.
 		$dataset    = array_slice( $dataset, ( ( $current - 1 ) * $paginate ), $paginate );
 
-		// Do the column headers
+		// Do the column headers.
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		// Make sure we have the single action running.
@@ -88,7 +87,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		$this->process_bulk_action();
 
 		// Check for the _POST value to export.
-		if ( ! empty( $_POST['wc-product-interest-export-submit' ] ) && 'all' === sanitize_text_field( $_POST['wc-product-interest-export-submit' ] ) ) {
+		if ( ! empty( $_POST['wc-product-interest-export-submit'] ) && 'all' === sanitize_text_field( wp_unslash( $_POST['wc-product-interest-export-submit'] ) ) ) { // WPCS: CSRF ok.
 			$this->process_export_submit();
 		}
 
@@ -99,7 +98,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table.
 	 *
-	 * @return Array
+	 * @return array
 	 */
 	public function get_columns() {
 
@@ -119,7 +118,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	/**
 	 * Display all the things.
 	 *
-	 * @return HTML
+	 * @return void
 	 */
 	public function display() {
 
@@ -133,7 +132,9 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	/**
 	 * Add extra markup in the toolbars before or after the list.
 	 *
-	 * @param string $which  Which markup area after (bottom) or before (top) the list.
+	 * @param  string $which  Which markup area after (bottom) or before (top) the list.
+	 *
+	 * @return HTML
 	 */
 	protected function extra_tablenav( $which ) {
 
@@ -184,7 +185,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		}
 
 		// See if we have one selected already.
-		$select = ! empty( $_POST['wc-product-interest-product-filter'] ) ? absint( $_POST['wc-product-interest-product-filter'] ) : 0;
+		$select = ! empty( $_POST['wc-product-interest-product-filter'] ) ? absint( $_POST['wc-product-interest-product-filter'] ) : 0; // WPCS: CSRF ok.
 
 		// Set an empty.
 		$build  = '';
@@ -217,13 +218,13 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Close the div.
 		$build .= '</div>';
 
-		// And return the build.
-		if ( ! $echo ) {
-			return $build;
+		// Echo if requested.
+		if ( ! empty( $echo ) ) {
+			echo $build; // WPCS: XSS ok.
 		}
 
-		// Echo out the build.
-		echo $build;
+		// Return it.
+		return $build;
 	}
 
 	/**
@@ -244,7 +245,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		}
 
 		// See if we have one selected already.
-		$select = ! empty( $_POST['wc-product-interest-customer-filter'] ) ? absint( $_POST['wc-product-interest-customer-filter'] ) : 0;
+		$select = ! empty( $_POST['wc-product-interest-customer-filter'] ) ? absint( $_POST['wc-product-interest-customer-filter'] ) : 0; // WPCS: CSRF ok.
 
 		// Set an empty.
 		$build  = '';
@@ -272,13 +273,13 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Close the div.
 		$build .= '</div>';
 
-		// And return the build.
-		if ( ! $echo ) {
-			return $build;
+		// Echo if requested.
+		if ( ! empty( $echo ) ) {
+			echo $build; // WPCS: XSS ok.
 		}
 
-		// Echo out the build.
-		echo $build;
+		// Return it.
+		return $build;
 	}
 
 	/**
@@ -292,7 +293,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	 */
 	protected function handle_row_actions( $item, $column_name, $primary ) {
 		return apply_filters( Core\HOOK_PREFIX . 'table_row_actions', '', $item, $column_name, $primary );
- 	}
+	}
 
 	/**
 	 * Define the sortable columns.
@@ -333,7 +334,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		// Make a basic array of the actions we wanna include.
 		$setup  = array(
 			'wc_product_interest_unsubscribe' => __( 'Unsubscribe', 'woo-interest-in-products' ),
-			'wc_product_interest_export'      => __( 'Export', 'woo-interest-in-products' )
+			'wc_product_interest_export'      => __( 'Export', 'woo-interest-in-products' ),
 		);
 
 		// Return it filtered.
@@ -437,13 +438,13 @@ class ProductInterestSignups_Table extends WP_List_Table {
 		}
 
 		// If we had customer IDs passed, filter and purge transients.
-		if ( ! empty( $_POST['wc_product_interest_customer_ids'] ) ) {
-			$this->purge_customer_transients( $_POST['wc_product_interest_customer_ids'] );
+		if ( ! empty( $_POST['wc_product_interest_customer_ids'] ) ) { // WPCS: CSRF ok.
+			$this->purge_customer_transients( $_POST['wc_product_interest_customer_ids'] ); // WPCS: CSRF ok.
 		}
 
 		// If we had product IDs passed, filter and purge transients.
-		if ( ! empty( $_POST['wc_product_interest_product_ids'] ) ) {
-			$this->purge_product_transients( $_POST['wc_product_interest_product_ids'] );
+		if ( ! empty( $_POST['wc_product_interest_product_ids'] ) ) { // WPCS: CSRF ok.
+			$this->purge_product_transients( $_POST['wc_product_interest_product_ids'] ); // WPCS: CSRF ok.
 		}
 
 		// Redirect to the success.
@@ -746,17 +747,29 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	public function no_items() {
 
 		// If we have no filtering, return the default.
-		if ( empty( $_POST['wc-product-interest-filter-submit'] ) ) {
+		if ( empty( $_POST['wc-product-interest-filter-submit'] ) ) { // WPCS: CSRF ok.
 
-			// Echo out the message.
-			echo apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', '<em>' . esc_html__( 'No current signups were found.', 'woo-interest-in-products' ) . '</em>', false );
+			// Set my message text.
+			$msgtxt = '<em>' . esc_html__( 'No current signups were found.', 'woo-interest-in-products' ) . '</em>';
+
+			// Filter the message.
+			$msgtxt = apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', wp_kses_post( $msgtxt ), false );
+
+			// And echo it out.
+			echo wp_kses_post( $msgtxt );
 
 			// And return, so we don't mess with it more.
 			return;
 		}
 
-		// Echo out the 'no items' verbiage.
-		echo apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', '<em>' . esc_html__( 'No signups for the selected products or customers were found.', 'woo-interest-in-products' ) . '</em>', true );
+		// Set my message text.
+		$msgtxt = '<em>' . esc_html__( 'No signups for the selected products or customers were found.', 'woo-interest-in-products' ) . '</em>';
+
+		// Filter the message.
+		$msgtxt = apply_filters( Core\HOOK_PREFIX . 'column_no_items_text', wp_kses_post( $msgtxt ), false );
+
+		// And echo it out.
+		echo wp_kses_post( $msgtxt );
 	}
 
 	/**
@@ -817,7 +830,7 @@ class ProductInterestSignups_Table extends WP_List_Table {
 	protected function maybe_filter_dataset( $dataset = array() ) {
 
 		// Return the dataset we got if we don't have the submit.
-		if ( empty( $_POST['wc-product-interest-filter-submit' ] ) ) {
+		if ( empty( $_POST['wc-product-interest-filter-submit'] ) ) {
 			return $dataset;
 		}
 

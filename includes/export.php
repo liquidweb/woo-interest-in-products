@@ -31,7 +31,12 @@ function export_subscription_data() {
 
 	// Fail on a missing or bad nonce.
 	if ( empty( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'wc_product_interest_export' ) ) {
-		Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'bad_nonce' ) );
+		Helpers\admin_page_redirect(
+			array(
+				'success' => 0,
+				'errcode' => 'bad_nonce',
+			)
+		);
 	}
 
 	// Fetch the dataset requested.
@@ -39,7 +44,12 @@ function export_subscription_data() {
 
 	// Fail on missing data.
 	if ( ! $stored ) {
-		Helpers\admin_page_redirect( array( 'success' => 0, 'errcode' => 'missing_stored_data' ) );
+		Helpers\admin_page_redirect(
+			array(
+				'success' => 0,
+				'errcode' => 'missing_stored_data',
+			)
+		);
 	}
 
 	// Add our headers and filename for direct download.

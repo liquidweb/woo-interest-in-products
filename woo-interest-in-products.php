@@ -20,7 +20,7 @@ namespace LiquidWeb\WooInterestInProducts;
 // Call our CLI namespace.
 use WP_CLI;
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Define our plugin version.
@@ -80,10 +80,11 @@ require_once __DIR__ . '/includes/account.php';
 require_once __DIR__ . '/includes/ajax-actions.php';
 require_once __DIR__ . '/includes/checkout.php';
 require_once __DIR__ . '/includes/export.php';
-require_once __DIR__ . '/includes/table-views.php';
 require_once __DIR__ . '/includes/admin.php';
 require_once __DIR__ . '/includes/settings-tab.php';
 
+// And our final file for the table views.
+require_once __DIR__ . '/includes/table-views.php';
 
 // Check that we have the constant available.
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
