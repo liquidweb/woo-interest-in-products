@@ -1,6 +1,6 @@
 {
   "name": "woo-interest-in-products",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Allow customers to opt-in to notices about individual products.",
   "repository": {
     "type": "git",
