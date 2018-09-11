@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Interest In Products
  * Plugin URI:  https://github.com/liquidweb/woo-interest-in-products
  * Description: Allow customers to opt-in to notices about individual products.
- * Version:     0.0.1
+ * Version:     0.1.0
  * Author:      Liquid Web
  * Author URI:  https://www.liquidweb.com
  * Text Domain: woo-interest-in-products
@@ -24,7 +24,7 @@ use WP_CLI;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Define our plugin version.
-define( __NAMESPACE__ . '\VERS', '0.0.1' );
+define( __NAMESPACE__ . '\VERS', '0.1.0' );
 
 // Define our database version.
 define( __NAMESPACE__ . '\DB_VERS', '1' );

@@ -7,6 +7,56 @@ module.exports = function( grunt ) {
 
     pkg: grunt.file.readJSON( 'package.json' ),
 
+    // Make our distribution copy.
+    copy: {
+      main: {
+        src: [
+          'assets/**',
+          'includes/**',
+          'languages/**',
+          'index.php',
+          'woo-interest-in-products.php',
+          'readme.txt',
+          'CHANGELOG.md',
+          'LICENSE',
+
+          /*
+           * Exclude files not necessary in the distribution.
+           *
+           * @link https://github.com/liquidweb/airstory-wp/issues/69
+           */
+          '!assets/scss/**',
+          '!assets/scss',
+          '!assets/css/**.map',
+        ],
+        dest: 'dist/'
+      },
+      screenshots: {
+        expand: true,
+        flatten: true,
+        cwd: 'repo-assets/screenshots/',
+        src: ['**'],
+        dest: 'dist/'
+      },
+    },
+
+    // Package up the plugin
+    compress: {
+      main: {
+        options: {
+          archive: 'release/<%= pkg.name %>-<%= pkg.version %>.zip'
+        },
+        files: [
+          {
+            expand: true,
+            cwd: 'dist/',
+            src: ['**'],
+            dest: '<%= pkg.name %>/'
+          }
+        ]
+      }
+    },
+
     // Process the textdomain.
     addtextdomain: {
       options: {

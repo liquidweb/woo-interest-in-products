@@ -1,15 +1,15 @@
-# WooCommerce Interest In Products #
-**Contributors:** [liquidweb](https://profiles.wordpress.org/liquidweb), [norcross](https://profiles.wordpress.org/norcross)  
-**Tags:** woocommerce, shopping cart, product interest, signups  
-**Requires at least:** 4.8  
-**Tested up to:** 4.9.8  
-**Stable tag:** 0.1.0  
-**License:** MIT  
-**License URI:** https://opensource.org/licenses/MIT  
+=== WooCommerce Interest In Products ===
+Contributors: liquidweb, norcross
+Tags: woocommerce, shopping cart, product interest, signups
+Requires at least: 4.8
+Tested up to: 4.9.8
+Stable tag: 0.1.0
+License: MIT
+License URI: https://opensource.org/licenses/MIT
 
 Allow customers to opt-in to notices about individual products.
 
-## Description ##
+== Description ==
 
 Allow customers to opt-in to news and information about the individual
 products they purchase. Each signup is listed in the admin dashboard,
@@ -20,7 +20,7 @@ Features
 * CSS based countdown display
 * available actions and filters to modify functionality.
 
-## Installation ##
+== Installation ==
 
 This section describes how to install the plugin and get it working.
 
@@ -28,26 +28,26 @@ This section describes how to install the plugin and get it working.
 1. Activate the plugin through the 'Plugins' menu in WordPress.
 1. Activate individual products, or use the `wp woo-product-interest enable_all_products` WP CLI command to enable all.
 
-## Frequently Asked Questions ##
+== Frequently Asked Questions ==
 
-### Why do I need this? ###
+= Why do I need this? =
 
 Everyone has their reasons.
 
 
-## Screenshots ##
+== Screenshots ==
 
 1. This is an example of the current product interest signups.
 1. This is an example of the product metabox to enable a product.
 1. This is an example of the signup prompt displayed to the customer.
 
-## Changelog ##
+== Changelog ==
 
-### 0.1.0 ###
+= 0.1.0 =
 * Initial release
 
 
-## Upgrade Notice ##
+== Upgrade Notice ==
 
-### 0.1.0 ###
+= 0.1.0 =
 Initial release
