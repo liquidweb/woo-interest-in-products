@@ -199,6 +199,9 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'i18n', ['addtextdomain', 'makepot'] );
   grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 
+  // Package a release
+  grunt.registerTask('release', ['wp_readme_to_markdown', 'sass:dist', 'cssmin', 'uglify:all', 'copy:main', 'copy:screenshots', 'compress']);
+
   // Compile SASS and minify assets
   grunt.registerTask( 'pre-commit', ['sass:dist', 'cssmin', 'uglify:all'] );
 
