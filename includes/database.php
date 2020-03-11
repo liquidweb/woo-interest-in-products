@@ -30,7 +30,7 @@ function register_table() {
 	// Load the global DB.
 	global $wpdb;
 
-	// Set the messages.
+	// Set the product interest table.
 	$wpdb->wc_product_interest = $wpdb->prefix . Core\TABLE_NAME;
 }
 
@@ -45,7 +45,7 @@ function maybe_table_exists() {
 	global $wpdb;
 
 	// Set my table name.
-	$table  = $wpdb->wc_product_interest;
+	$table  = $wpdb->prefix . Core\TABLE_NAME;
 
 	// Run the lookup.
 	$lookup = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) );
@@ -105,7 +105,7 @@ function install_table() {
 	// Pull our character set and collating.
 	$char_coll  = $wpdb->get_charset_collate();
 
-	// Set our various table names.
+	// Set our table name.
 	$table_name = $wpdb->prefix . Core\TABLE_NAME;
 
 	// Write the SQL syntax.
