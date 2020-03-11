@@ -2,8 +2,8 @@
 **Contributors:** [liquidweb](https://profiles.wordpress.org/liquidweb), [norcross](https://profiles.wordpress.org/norcross)  
 **Tags:** woocommerce, shopping cart, product interest, signups  
 **Requires at least:** 4.8  
-**Tested up to:** 4.9.8  
-**Stable tag:** 0.1.0  
+**Tested up to:** 5.4.0  
+**Stable tag:** 0.1.1  
 **License:** MIT  
 **License URI:** https://opensource.org/licenses/MIT  
 
@@ -42,6 +42,9 @@ Everyone has their reasons.
 1. This is an example of the signup prompt displayed to the customer.
 
 ## Changelog ##
+
+### 0.1.1 - 03/11/2020 ###
+* fixing initial table name registration at plugin activation
 
 ### 0.1.0 ###
 * Initial release

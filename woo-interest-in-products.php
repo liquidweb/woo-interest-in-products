@@ -1,15 +1,19 @@
 <?php
 /**
- * Plugin Name: WooCommerce Interest In Products
- * Plugin URI:  https://github.com/liquidweb/woo-interest-in-products
- * Description: Allow customers to opt-in to notices about individual products.
- * Version:     0.1.0
- * Author:      Liquid Web
- * Author URI:  https://www.liquidweb.com
- * Text Domain: woo-interest-in-products
- * Domain Path: /languages
- * License:     MIT
- * License URI: https://opensource.org/licenses/MIT
+ * Plugin Name:          WooCommerce Interest In Products
+ * Plugin URI:           https://github.com/liquidweb/woo-interest-in-products
+ * Description:          Allow customers to opt-in to notices about individual products.
+ * Version:              0.1.1
+ * Author:               Liquid Web
+ * Author URI:           https://www.liquidweb.com
+ * Text Domain:          woo-interest-in-products
+ * Domain Path:          /languages
+ * Requires at least:    4.4
+ * Tested up to:         5.4.0
+ * WC requires at least: 3.7.0
+ * WC tested up to:      3.9.0
+ * License:              MIT
+ * License URI:          https://opensource.org/licenses/MIT
  *
  * @package WooInterestInProducts
  */
@@ -24,7 +28,7 @@ use WP_CLI;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Define our plugin version.
-define( __NAMESPACE__ . '\VERS', '0.1.0' );
+define( __NAMESPACE__ . '\VERS', '0.1.1' );
 
 // Define our database version.
 define( __NAMESPACE__ . '\DB_VERS', '1' );
