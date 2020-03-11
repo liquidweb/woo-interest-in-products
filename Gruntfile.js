@@ -40,6 +40,23 @@ module.exports = function( grunt ) {
       },
     },
 
+    // Handle all the dev stuff.
+    devUpdate: {
+      main: {
+        options: {
+          updateType: 'force', //just report outdated packages
+          reportUpdated: false, //don't report up-to-date packages
+          semver: true, //stay within semver when updating
+          packages: {
+            devDependencies: true, //only check for devDependencies
+            dependencies: false
+        },
+        packageJson: null, //use matchdep default findup to locate package.json
+        reportOnlyPkgs: [] //use updateType action on all packages
+        }
+      }
+    },
+
     // Package up the plugin
     compress: {
       main: {
@@ -131,9 +148,8 @@ module.exports = function( grunt ) {
     sass: {
       dist: {
         options: {
-        style: 'nested',
-        unixNewlines: true
-      },
+          style: 'compressed'
+        },
         expand: true,
         cwd: 'assets/scss',
         src: ['*.scss'],
@@ -142,10 +158,9 @@ module.exports = function( grunt ) {
       },
       dev: {
         options: {
-        style: 'nested',
-        lineNumbers: true,
-        unixNewlines: true
-      },
+          style: 'expanded',
+          lineNumbers: true
+        },
         expand: true,
         cwd: 'assets/scss',
         src: ['*.scss'],
@@ -182,10 +197,11 @@ module.exports = function( grunt ) {
 
   } );
 
+  grunt.loadNpmTasks( 'grunt-dev-update' );
+  grunt.loadNpmTasks( 'grunt-check-modules' );
+  grunt.loadNpmTasks( 'grunt-required' );
   grunt.loadNpmTasks( 'grunt-wp-i18n' );
   grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
-  grunt.loadNpmTasks( 'grunt-required' );
-  grunt.loadNpmTasks( 'grunt-check-modules' );
   grunt.loadNpmTasks( 'grunt-contrib-copy' );
   grunt.loadNpmTasks( 'grunt-contrib-compress' );
   grunt.loadNpmTasks( 'grunt-contrib-clean' );
@@ -200,7 +216,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 
   // Package a release
-  grunt.registerTask('release', ['wp_readme_to_markdown', 'sass:dist', 'cssmin', 'uglify:all', 'copy:main', 'copy:screenshots', 'compress']);
+  grunt.registerTask( 'release', ['wp_readme_to_markdown', 'sass:dist', 'cssmin', 'uglify:all', 'copy:main', 'copy:screenshots', 'compress'] );
 
   // Compile SASS and minify assets
   grunt.registerTask( 'pre-commit', ['sass:dist', 'cssmin', 'uglify:all'] );

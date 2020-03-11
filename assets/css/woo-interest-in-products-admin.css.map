@@ -1,7 +1,1 @@
-{
-"version": 3,
-"mappings": "AAME;2DACgB;EACf,WAAW,EAAE,GAAG;;AAMnB,kCAAmC;EAClC,OAAO,EAAE,YAAY;EACrB,cAAc,EAAE,GAAG;EAEnB,yEAAyC;IACxC,WAAW,EAAE,IAAI;;AAInB,wCAAyC;EAExC,OAAO,EAAE,KAAK;EAEd,sFAAgD;IAC/C,SAAS,EAAE,IAAI;EAOf,0FAAM;IACL,UAAU,EAAE,MAAM;IAClB,WAAW,EAAE,GAAG;IAChB,cAAc,EAAE,OAAO;IACvB,MAAM,EAAE,OAAO;EAQjB,mFAA6C;IAC5C,UAAU,EAAE,MAAM;IAClB,SAAS,EAAE,GAAG;;AAMhB,oCAAqC;EAEpC,MAAM,EAAE,CAAC;EAgBR,yGAAgC;IAC/B,KAAK,EAAE,IAAI;IACX,YAAY,EAAE,GAAG",
-"sources": ["../scss/admin/_interests-table.scss"],
-"names": [],
-"file": "woo-interest-in-products-admin.css"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/admin/_interests-table.scss"],"names":[],"mappings":"AAME,wHAEC,gBAMH,mCACC,qBACA,mBAEA,0EACC,iBAIF,yCAEC,cAEA,uFACC,eAOA,2FACC,kBACA,gBACA,uBACA,eAQF,oFACC,kBACA,cAMF,qCAEC,SAgBC,0GACC,WACA","file":"woo-interest-in-products-admin.css"}
