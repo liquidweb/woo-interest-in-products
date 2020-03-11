@@ -1,0 +1,355 @@
+# Copyright (C) 2020 Liquid Web
+# This file is distributed under the MIT.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Interest In Products 0.1.1\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/woo-interest-in-products\n"
+"POT-Creation-Date: 2020-03-11 17:12:21+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2020-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Country: United States\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
+"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
+"X-Poedit-Basepath: ../\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-Bookmarks: \n"
+"X-Textdomain-Support: yes\n"
+"X-Generator: grunt-wp-i18n 1.0.3\n"
+
+#: dist/includes/account.php:221 includes/account.php:221
+msgid "My Product Interest Signups"
+msgstr ""
+
+#: dist/includes/account.php:240 dist/includes/settings-tab.php:60
+#: includes/account.php:240 includes/settings-tab.php:60
+msgid "Product Interest"
+msgstr ""
+
+#: dist/includes/admin.php:42 includes/admin.php:42
+msgid "Would you like to enable product interest signups on all your products now?"
+msgstr ""
+
+#: dist/includes/admin.php:45 includes/admin.php:45
+msgid "Yes"
+msgstr ""
+
+#: dist/includes/admin.php:45 includes/admin.php:45
+msgid "No"
+msgstr ""
+
+#: dist/includes/admin.php:79 includes/admin.php:79
+msgid "All your current products have been enabled."
+msgstr ""
+
+#: dist/includes/admin.php:83 includes/admin.php:83
+msgid "Your selection has been recorded."
+msgstr ""
+
+#: dist/includes/checkout.php:124 includes/checkout.php:124
+msgid "ID %d is not a valid product"
+msgstr ""
+
+#: dist/includes/checkout.php:137 includes/checkout.php:137
+msgid "Signups have not been enabled for product ID %d"
+msgstr ""
+
+#: dist/includes/commands.php:78 includes/commands.php:78
+msgid "No product IDs could be retrieved."
+msgstr ""
+
+#: dist/includes/commands.php:85 includes/commands.php:85
+msgid "Updating products..."
+msgstr ""
+
+#: dist/includes/commands.php:107 includes/commands.php:107
+msgid "%d product has been updated."
+msgid_plural "%d products have been updated."
+msgstr[0] ""
+msgstr[1] ""
+
+#: dist/includes/database.php:145 dist/includes/database.php:216
+#: dist/includes/queries.php:296 includes/database.php:145
+#: includes/database.php:216 includes/queries.php:296
+msgid "The required customer ID is missing."
+msgstr ""
+
+#: dist/includes/database.php:150 includes/database.php:150
+msgid "The required product IDs are missing or invalid."
+msgstr ""
+
+#: dist/includes/database.php:167 dist/includes/database.php:240
+#: dist/includes/queries.php:205 includes/database.php:167
+#: includes/database.php:240 includes/queries.php:205
+msgid "The required product ID is missing or invalid."
+msgstr ""
+
+#: dist/includes/database.php:191 includes/database.php:191
+msgid "There was an error adding this to the database."
+msgstr ""
+
+#: dist/includes/database.php:245 dist/includes/queries.php:210
+#: includes/database.php:245 includes/queries.php:210
+msgid "Subscriptions are not enabled for this product."
+msgstr ""
+
+#: dist/includes/database.php:269 dist/includes/queries.php:365
+#: includes/database.php:269 includes/queries.php:365
+msgid "The required relationship ID is missing."
+msgstr ""
+
+#: dist/includes/export.php:131 dist/includes/table-views.php:108
+#: includes/export.php:131 includes/table-views.php:108
+msgid "Customer Name"
+msgstr ""
+
+#: dist/includes/export.php:132 includes/export.php:132
+msgid "Customer Email"
+msgstr ""
+
+#: dist/includes/export.php:133 dist/includes/table-views.php:109
+#: includes/export.php:133 includes/table-views.php:109
+msgid "Product Name"
+msgstr ""
+
+#: dist/includes/export.php:134 includes/export.php:134
+msgid "Product SKU"
+msgstr ""
+
+#: dist/includes/export.php:135 dist/includes/table-views.php:110
+#: includes/export.php:135 includes/table-views.php:110
+msgid "Signup Date"
+msgstr ""
+
+#: dist/includes/helpers.php:27 includes/helpers.php:27
+msgid "Your interest selections have been updated."
+msgstr ""
+
+#: dist/includes/helpers.php:32 includes/helpers.php:32
+msgid "Success! Your request has been completed."
+msgstr ""
+
+#: dist/includes/helpers.php:36 includes/helpers.php:36
+msgid "Your settings could not be updated."
+msgstr ""
+
+#: dist/includes/helpers.php:40 includes/helpers.php:40
+msgid "The required nonce was missing."
+msgstr ""
+
+#: dist/includes/helpers.php:44 includes/helpers.php:44
+msgid "The required nonce was invalid."
+msgstr ""
+
+#: dist/includes/helpers.php:48 includes/helpers.php:48
+msgid "The required nonce was missing or invalid."
+msgstr ""
+
+#: dist/includes/helpers.php:52 includes/helpers.php:52
+msgid "The required customer ID was not provided."
+msgstr ""
+
+#: dist/includes/helpers.php:56 includes/helpers.php:56
+msgid "The current customer could not be determined."
+msgstr ""
+
+#: dist/includes/helpers.php:60 includes/helpers.php:60
+msgid "No existing product signups were found."
+msgstr ""
+
+#: dist/includes/helpers.php:64 includes/helpers.php:64
+msgid "Your interest selections could not be updated."
+msgstr ""
+
+#: dist/includes/helpers.php:68 includes/helpers.php:68
+msgid "Please review all the required fields."
+msgstr ""
+
+#: dist/includes/helpers.php:73 includes/helpers.php:73
+msgid "There was an unknown error with your request."
+msgstr ""
+
+#: dist/includes/helpers.php:77 includes/helpers.php:77
+msgid "There was an error with your request."
+msgstr ""
+
+#: dist/includes/layout.php:32 includes/layout.php:32
+msgid "Keep me informed about my products."
+msgstr ""
+
+#: dist/includes/layout.php:101 includes/layout.php:101
+msgid "Customer ID: %d"
+msgstr ""
+
+#: dist/includes/layout.php:128 includes/layout.php:128
+msgid "Click here to view all product interest signups"
+msgstr ""
+
+#: dist/includes/layout.php:128 includes/layout.php:128
+msgid "View all product interest signups"
+msgstr ""
+
+#: dist/includes/layout.php:155 includes/layout.php:155
+msgid "Name"
+msgstr ""
+
+#: dist/includes/layout.php:156 includes/layout.php:156
+msgid "Signup"
+msgstr ""
+
+#: dist/includes/layout.php:228 includes/layout.php:228
+msgid "You have not signed up for any products."
+msgstr ""
+
+#: dist/includes/layout.php:280 includes/layout.php:280
+msgid ""
+"Below are the products you requested to stay informed about. You can review "
+"and update your subscriptions at any time."
+msgstr ""
+
+#: dist/includes/layout.php:295 includes/layout.php:295
+msgid "Update Your Selections"
+msgstr ""
+
+#: dist/includes/layout.php:384 includes/layout.php:384
+msgid "Signup Date: %s"
+msgstr ""
+
+#: dist/includes/layout.php:409 includes/layout.php:409
+msgid "Dismiss this notice."
+msgstr ""
+
+#: dist/includes/post-meta.php:70 includes/post-meta.php:70
+msgid "Interested Customers"
+msgstr ""
+
+#: dist/includes/post-meta.php:89 includes/post-meta.php:89
+msgid "No customers have signed up to this product."
+msgstr ""
+
+#: dist/includes/post-meta.php:115 includes/post-meta.php:115
+msgid "Include product signup"
+msgstr ""
+
+#: dist/includes/post-meta.php:116 includes/post-meta.php:116
+msgid "Displays a checkbox for this particular product at checkout."
+msgstr ""
+
+#: dist/includes/queries.php:45 dist/includes/queries.php:96
+#: dist/includes/queries.php:155 dist/includes/queries.php:246
+#: dist/includes/queries.php:332 dist/includes/queries.php:401
+#: dist/includes/queries.php:468 includes/queries.php:45
+#: includes/queries.php:96 includes/queries.php:155 includes/queries.php:246
+#: includes/queries.php:332 includes/queries.php:401 includes/queries.php:468
+msgid "Could not execute query"
+msgstr ""
+
+#: dist/includes/settings-tab.php:59 dist/includes/table-views.php:39
+#: includes/settings-tab.php:59 includes/table-views.php:39
+msgid "Product Interest Signups"
+msgstr ""
+
+#: dist/includes/settings-tab.php:103 includes/settings-tab.php:103
+msgid "There are no enabled products."
+msgstr ""
+
+#: dist/includes/table-views.php:38 includes/table-views.php:38
+msgid "Product Interest Signup"
+msgstr ""
+
+#: dist/includes/table-views.php:111 includes/table-views.php:111
+msgid "Actions"
+msgstr ""
+
+#: dist/includes/table-views.php:159 includes/table-views.php:159
+msgid "Filter"
+msgstr ""
+
+#: dist/includes/table-views.php:163 includes/table-views.php:163
+msgid "Export All Entries"
+msgstr ""
+
+#: dist/includes/table-views.php:197 includes/table-views.php:197
+msgid "Filter by product"
+msgstr ""
+
+#: dist/includes/table-views.php:203 includes/table-views.php:203
+msgid "All Products"
+msgstr ""
+
+#: dist/includes/table-views.php:257 includes/table-views.php:257
+msgid "Filter by customer"
+msgstr ""
+
+#: dist/includes/table-views.php:263 includes/table-views.php:263
+msgid "All Customers"
+msgstr ""
+
+#: dist/includes/table-views.php:336 includes/table-views.php:336
+msgid "Unsubscribe"
+msgstr ""
+
+#: dist/includes/table-views.php:337 includes/table-views.php:337
+msgid "Export"
+msgstr ""
+
+#: dist/includes/table-views.php:529 includes/table-views.php:529
+msgid "Select signup"
+msgstr ""
+
+#: dist/includes/table-views.php:578 includes/table-views.php:578
+msgid "SKU"
+msgstr ""
+
+#: dist/includes/table-views.php:687 includes/table-views.php:687
+msgid "View Customer"
+msgstr ""
+
+#: dist/includes/table-views.php:694 includes/table-views.php:694
+msgid "View Orders"
+msgstr ""
+
+#: dist/includes/table-views.php:701 includes/table-views.php:701
+msgid "View Product"
+msgstr ""
+
+#: dist/includes/table-views.php:753 includes/table-views.php:753
+msgid "No current signups were found."
+msgstr ""
+
+#: dist/includes/table-views.php:766 includes/table-views.php:766
+msgid "No signups for the selected products or customers were found."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WooCommerce Interest In Products"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/liquidweb/woo-interest-in-products"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Allow customers to opt-in to notices about individual products."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Liquid Web"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://www.liquidweb.com"
+msgstr ""
+
+#: dist/includes/helpers.php:544 includes/helpers.php:544
+msgctxt "%s = human-readable time difference"
+msgid "%s ago"
+msgstr ""
